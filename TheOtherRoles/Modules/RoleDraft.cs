@@ -27,6 +27,8 @@ namespace TheOtherRoles.Modules
         public static List<byte> alreadyPicked = new();
         public static IEnumerator CoSelectRoles(IntroCutscene __instance)
         {
+            if (!isEnabled) yield break;
+
             isRunning = true;
             SoundEffectsManager.play("draft", volume: 1f, true, true);
             alreadyPicked.Clear();
@@ -395,40 +397,6 @@ namespace TheOtherRoles.Modules
             {
                 pickOrder.Add(reader.ReadByte());
             }
-        }
-
-        class PatchedEnumerator() : IEnumerable
-        {
-            public IEnumerator enumerator;
-            public IEnumerator Postfix;
-            public IEnumerator GetEnumerator()
-            {
-                while (enumerator.MoveNext())
-                {
-                    yield return enumerator.Current;
-                }
-                while (Postfix.MoveNext())
-                    yield return Postfix.Current;
-            }
-        }
-
-
-        [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.ShowTeam))]
-
-        class ShowRolePatch
-        {
-            [HarmonyPostfix]
-            public static void Postfix(IntroCutscene __instance, ref Il2CppSystem.Collections.IEnumerator __result)
-            {
-                if (!isEnabled) return;
-                var newEnumerator = new PatchedEnumerator()
-                {
-                    enumerator = __result.WrapToManaged(),
-                    Postfix = CoSelectRoles(__instance)
-                };
-                __result = newEnumerator.GetEnumerator().WrapToIl2Cpp();
-            }
-
         }
     }
 }

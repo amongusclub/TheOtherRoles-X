@@ -20,6 +20,7 @@ using Il2CppSystem.Text;
 using Reactor.Networking.Attributes;
 using AmongUs.Data;
 using TheOtherRoles.Modules.CustomHats;
+using AmongUs.Data.Player;
 
 namespace TheOtherRoles
 {
@@ -92,8 +93,10 @@ namespace TheOtherRoles
         public override void Load() {
             Logger = Log;
             Instance = this;
-  
+
+#if PC
             _ = Helpers.checkBeta(); // Exit if running an expired beta
+#endif
             _ = Patches.CredentialsPatch.MOTD.loadMOTDs();
 
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
@@ -124,11 +127,13 @@ namespace TheOtherRoles
             CustomOptionHolder.Load();
             CustomColors.Load();
             CustomHatManager.LoadHats();
+#if PC
             if (BepInExUpdater.UpdateRequired)
             {
                 AddComponent<BepInExUpdater>();
                 return;
             }
+#endif
 
             AddComponent<ModUpdater>();
 
@@ -142,8 +147,8 @@ namespace TheOtherRoles
     }
 
     // Deactivate bans, since I always leave my local testing game and ban myself
-    [HarmonyPatch(typeof(StatsManager), nameof(StatsManager.AmBanned), MethodType.Getter)]
-    public static class AmBannedPatch
+    [HarmonyPatch(typeof(PlayerBanData), nameof(PlayerBanData.IsBanned), MethodType.Getter)]
+    public static class IsBannedPatch
     {
         public static void Postfix(out bool __result)
         {

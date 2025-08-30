@@ -30,9 +30,7 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to <color=#ff351f>All-Of-Us-Mods</
         {
 
             static void Postfix(PingTracker __instance){
-                __instance.text.alignment = TextAlignmentOptions.Top;
                 var position = __instance.GetComponent<AspectPosition>();
-                position.Alignment = AspectPosition.EdgeAlignments.Top;
                 if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started) {
                     string gameModeText = $"";
                     if (HideNSeek.isHideNSeekGM) gameModeText = $"Hide 'N Seek";
@@ -40,8 +38,11 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to <color=#ff351f>All-Of-Us-Mods</
                     else if (PropHunt.isPropHuntGM) gameModeText = "Prop Hunt";
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText) + (MeetingHud.Instance ? " " : "\n");
                     __instance.text.text = $"<size=130%><color=#ff351f>TheOtherRoles</color>-<color=#02C3FE>X</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n{gameModeText}" + __instance.text.text;
-                    position.DistanceFromEdge = MeetingHud.Instance ? new Vector3(1.25f, 0.15f, 0) : new Vector3(1.55f, 0.15f, 0);
-                } else {
+                    __instance.text.alignment = TextAlignmentOptions.Top;
+                    position.Alignment = AspectPosition.EdgeAlignments.Top;
+                    position.DistanceFromEdge = new Vector3(1.5f, 0.11f, 0);
+                }
+                else {
                     string gameModeText = $"";
                     if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) gameModeText = $"Hide 'N Seek";
                     else if (TORMapOptions.gameMode == CustomGamemodes.Guesser) gameModeText = $"Guesser";
@@ -49,16 +50,18 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to <color=#ff351f>All-Of-Us-Mods</
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText);
 
                     __instance.text.text = $"{fullCredentialsVersion}\n{fullCredentials}\n {__instance.text.text}";
-                    position.DistanceFromEdge = new Vector3( 0f, 0.1f, 0);
+                    position.Alignment = AspectPosition.EdgeAlignments.LeftTop;
+                    __instance.text.alignment = TextAlignmentOptions.TopLeft;
+                    position.DistanceFromEdge = new Vector3(0.5f, 0.11f);
 
-                    try {
+                    try
+                    {
                         var GameModeText = GameObject.Find("GameModeText")?.GetComponent<TextMeshPro>();
                         GameModeText.text = gameModeText == "" ? (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek ? "Van. HideNSeek" : "Classic" ): gameModeText;
                         var ModeLabel = GameObject.Find("ModeLabel")?.GetComponentInChildren<TextMeshPro>();
                         ModeLabel.text = "Game Mode";
                     } catch { }
                 }
-                position.AdjustPosition();
             }
         }
 
@@ -81,11 +84,7 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to <color=#ff351f>All-Of-Us-Mods</
 
                 renderer = torLogo.AddComponent<SpriteRenderer>();
                 loadSprites();
-                renderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner.png", 300f);
-
                 instance = __instance;
-                loadSprites();
-                // renderer.sprite = TORMapOptions.enableHorseMode ? horseBannerSprite : bannerSprite;
                 renderer.sprite = EventUtility.isEnabled ? banner2Sprite : bannerSprite;
                 var credentialObject = new GameObject("credentialsTOR");
                 var credentials = credentialObject.AddComponent<TextMeshPro>();
@@ -165,7 +164,7 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to <color=#ff351f>All-Of-Us-Mods</
 
             public static async Task loadMOTDs() {
                 HttpClient client = new HttpClient();
-                HttpResponseMessage response = await client.GetAsync("https://raw.githubusercontent.com/TheOtherRolesAU/MOTD/main/motd.txt");
+                HttpResponseMessage response = await client.GetAsync("https://dlhk.fangkuai.fun/TheOtherRoles-X/motd.txt");
                 response.EnsureSuccessStatusCode();
                 string motds = await response.Content.ReadAsStringAsync();
                 foreach(string line in motds.Split("\n", StringSplitOptions.RemoveEmptyEntries)) {

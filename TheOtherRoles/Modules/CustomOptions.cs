@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using HarmonyLib;
 using Hazel;
-using System.Reflection;
 using System.Text;
 using TheOtherRoles.Utilities;
 using static TheOtherRoles.TheOtherRoles;
@@ -17,9 +16,6 @@ using BepInEx.Unity.IL2CPP;
 using BepInEx;
 using static ShipStatus;
 using TMPro;
-using Rewired.Utils.Platforms.Windows;
-using static Il2CppSystem.Xml.Schema.FacetsChecker.FacetsCompiler;
-using TheOtherRoles;
 
 namespace TheOtherRoles {
     public class CustomOption {
@@ -302,7 +298,7 @@ namespace TheOtherRoles {
                 string vanillaSettingsSub = settingsSplit[2];
                 torOptionsFine = deserializeOptions(Convert.FromBase64String(torSettings));
                 ShareOptionSelections();
-                if (TheOtherRolesPlugin.Version > versionInfo && versionInfo < Version.Parse("4.6.0")) {
+                if (TheOtherRolesPlugin.Version > versionInfo && versionInfo < Version.Parse("1.0.0")) {
                     vanillaOptionsFine = false;
                     FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, "Host Info: Pasting vanilla settings failed, TOR Options applied!");
                 } else {
@@ -378,7 +374,6 @@ namespace TheOtherRoles {
     class LobbyViewSettingsPaneUpdatePatch {
         public static void Postfix(LobbyViewSettingsPane __instance) {
             if (LobbyViewSettingsPatch.currentButtons.Count == 0) {
-                LobbyViewSettingsPatch.gameModeChangedFlag = true;
                 LobbyViewSettingsPatch.Postfix(__instance);
                 
             }
@@ -390,15 +385,14 @@ namespace TheOtherRoles {
     class LobbyViewSettingsPatch{
         public static List<PassiveButton> currentButtons = new();
         public static List<CustomOptionType> currentButtonTypes = new();
-        public static bool gameModeChangedFlag = false;
 
-        public static void createCustomButton(LobbyViewSettingsPane __instance, int targetMenu, string buttonName, string buttonText, CustomOptionType optionType) {
+        public static void createCustomButton(LobbyViewSettingsPane __instance, int targetMenu, string buttonName, string buttonText, Vector3 vector, CustomOptionType optionType) {
             buttonName = "View" + buttonName;
             var buttonTemplate = GameObject.Find("OverviewTab");
             var torSettingsButton = GameObject.Find(buttonName);
             if (torSettingsButton == null) {
                 torSettingsButton = GameObject.Instantiate(buttonTemplate, buttonTemplate.transform.parent);
-                torSettingsButton.transform.localPosition += Vector3.right * 1.75f * (targetMenu - 2);
+                torSettingsButton.transform.localPosition = vector;
                 torSettingsButton.name = buttonName;
                 __instance.StartCoroutine(Effects.Lerp(2f, new Action<float>(p => { torSettingsButton.transform.FindChild("FontPlacer").GetComponentInChildren<TextMeshPro>().text = buttonText; })));
                 var torSettingsPassiveButton = torSettingsButton.GetComponent<PassiveButton>();
@@ -427,15 +421,14 @@ namespace TheOtherRoles {
 
         public static void removeVanillaTabs(LobbyViewSettingsPane __instance) {
             GameObject.Find("RolesTabs")?.Destroy();
-            var overview = GameObject.Find("OverviewTab");
-            if (!gameModeChangedFlag) {
-                overview.transform.localScale = new Vector3(0.5f * overview.transform.localScale.x, overview.transform.localScale.y, overview.transform.localScale.z);
-                overview.transform.localPosition += new Vector3(-1.2f, 0f, 0f);
-                
+            var overviewTab = GameObject.Find("OverviewTab");
+            if (TORMapOptions.gameMode == CustomGamemodes.Guesser || TORMapOptions.gameMode == CustomGamemodes.Classic)
+            {
+                overviewTab.transform.localScale = new Vector3(0.7f, 1f, 1f);
+                overviewTab.transform.localPosition = new Vector3(-5.771f, 1.404f, 0f);
+                overviewTab.transform.GetChild(0).GetChild(0).localScale = new Vector3(1.3f, 0.9f, 1f);
             }
-            overview.transform.Find("FontPlacer").transform.localScale = new Vector3(1.35f, 1f, 1f);
-            overview.transform.Find("FontPlacer").transform.localPosition = new Vector3(-0.6f, -0.1f, 0f);
-            gameModeChangedFlag = false;
+            overviewTab.transform.GetChild(0).GetChild(0).GetComponent<TextMeshPro>().alignment = TextAlignmentOptions.Center;
         }
 
         public static void drawTab(LobbyViewSettingsPane __instance, CustomOptionType optionType) {
@@ -492,8 +485,6 @@ namespace TheOtherRoles {
                     if ((int)optionType == 99)
                         categoryHeaderMasked.Title.text = new Dictionary<CustomOptionType, string>() { { CustomOptionType.Impostor, "Impostor Roles" }, { CustomOptionType.Neutral, "Neutral Roles" },
                             { CustomOptionType.Crewmate, "Crewmate Roles" }, { CustomOptionType.Modifier, "Modifiers" } }[curType];
-                    categoryHeaderMasked.Title.outlineColor = Color.white;
-                    categoryHeaderMasked.Title.outlineWidth = 0.2f;
                     categoryHeaderMasked.transform.SetParent(__instance.settingsContainer);
                     categoryHeaderMasked.transform.localScale = Vector3.one;
                     categoryHeaderMasked.transform.localPosition = new Vector3(-9.77f, num, -2f);
@@ -526,10 +517,8 @@ namespace TheOtherRoles {
                     viewSettingsInfoPanel.titleText.text = "Spawn Chance";
                 }
                 if ((int)optionType == 99) {
-                    viewSettingsInfoPanel.titleText.outlineColor = Color.white;
-                    viewSettingsInfoPanel.titleText.outlineWidth = 0.2f;
                     if (option.type == CustomOptionType.Modifier)
-                        viewSettingsInfoPanel.settingText.text = viewSettingsInfoPanel.settingText.text + GameOptionsDataPatch.buildModifierExtras(option);
+                        viewSettingsInfoPanel.settingText.text = viewSettingsInfoPanel.settingText.text + LegacyGameOptionsPatch.buildModifierExtras(option);
                 }
                 __instance.settingsInfo.Add(viewSettingsInfoPanel.gameObject);
 
@@ -593,26 +582,26 @@ namespace TheOtherRoles {
             if (TORMapOptions.gameMode == CustomGamemodes.Guesser || TORMapOptions.gameMode == CustomGamemodes.Classic) {
 
                 // create TOR settings
-                createCustomButton(__instance, next++, "TORSettings", "TOR Settings", CustomOptionType.General);
+                createCustomButton(__instance, next++, "TORSettings", "TOR Settings", new Vector3(-3.371f, 1.404f, 0f), CustomOptionType.General);
                    // create TOR settings
-                createCustomButton(__instance, next++, "RoleOverview", "Role Overview", (CustomOptionType)99);
+                createCustomButton(__instance, next++, "RoleOverview", "Role Overview", new Vector3(-0.971f, 1.404f, 0f), (CustomOptionType)99);
                 // IMp
-                createCustomButton(__instance, next++, "ImpostorSettings", "Impostor Roles", CustomOptionType.Impostor);
+                createCustomButton(__instance, next++, "ImpostorSettings", "Impostor Roles", new Vector3(1.429f, 1.404f, 0f), CustomOptionType.Impostor);
 
                 // Neutral
-                createCustomButton(__instance, next++, "NeutralSettings", "Neutral Roles", CustomOptionType.Neutral);
+                createCustomButton(__instance, next++, "NeutralSettings", "Neutral Roles", new Vector3(3.829f, 1.404f, 0f), CustomOptionType.Neutral);
                 // Crew
-                createCustomButton(__instance, next++, "CrewmateSettings", "Crewmate Roles", CustomOptionType.Crewmate);
+                createCustomButton(__instance, next++, "CrewmateSettings", "Crewmate Roles", new Vector3(-3.371f, 2.304f, 0f), CustomOptionType.Crewmate);
                 // Modifier
-                createCustomButton(__instance, next++, "ModifierSettings", "Modifiers", CustomOptionType.Modifier);
+                createCustomButton(__instance, next++, "ModifierSettings", "Modifiers", new Vector3(-0.971f, 2.304f, 0f), CustomOptionType.Modifier);
 
             } else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) {
                 // create Main HNS settings
-                createCustomButton(__instance, next++, "HideNSeekMain", "Hide 'N' Seek", CustomOptionType.HideNSeekMain);
+                createCustomButton(__instance, next++, "HideNSeekMain", "Hide 'N' Seek", new Vector3(-1.371f, 1.404f, 0f), CustomOptionType.HideNSeekMain);
                 // create HNS Role settings
-                createCustomButton(__instance, next++, "HideNSeekRoles", "Hide 'N' Seek Roles", CustomOptionType.HideNSeekRoles);
+                createCustomButton(__instance, next++, "HideNSeekRoles", "Hide 'N' Seek Roles", new Vector3(2.129f, 1.404f, 0f), CustomOptionType.HideNSeekRoles);
             } else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) {
-                createCustomButton(__instance, next++, "PropHunt", "Prop Hunt", CustomOptionType.PropHunt);
+                createCustomButton(__instance, next++, "PropHunt", "Prop Hunt", new Vector3(-1.371f, 1.404f, 0f), CustomOptionType.PropHunt);
             }
         }
     }
@@ -717,8 +706,6 @@ namespace TheOtherRoles {
                     CategoryHeaderMasked categoryHeaderMasked = UnityEngine.Object.Instantiate<CategoryHeaderMasked>(menu.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, menu.settingsContainer);
                     categoryHeaderMasked.SetHeader(StringNames.ImpostorsCategory, 20);
                     categoryHeaderMasked.Title.text = option.heading != "" ? option.heading : option.name;
-                    categoryHeaderMasked.Title.outlineColor = Color.white;
-                    categoryHeaderMasked.Title.outlineWidth = 0.2f;
                     categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
                     categoryHeaderMasked.transform.localPosition = new Vector3(-0.903f, num, -2f);
                     num -= 0.63f;
@@ -957,7 +944,7 @@ namespace TheOtherRoles {
 
 
     [HarmonyPatch] 
-    class GameOptionsDataPatch
+    class LegacyGameOptionsPatch
     {
         private static string buildRoleOptions() {
             var impRoles = buildOptionsOfType(CustomOption.CustomOptionType.Impostor, true) + "\n";
@@ -1141,15 +1128,15 @@ namespace TheOtherRoles {
     [HarmonyPatch]
     public class AddToKillDistanceSetting
     {
-        [HarmonyPatch(typeof(GameOptionsData), nameof(GameOptionsData.AreInvalid))]
+        [HarmonyPatch(typeof(LegacyGameOptions), nameof(LegacyGameOptions.AreInvalid))]
         [HarmonyPrefix]
         
-        public static bool Prefix(GameOptionsData __instance, ref int maxExpectedPlayers)
+        public static bool Prefix(LegacyGameOptions __instance, ref int maxExpectedPlayers)
         {
             //making the killdistances bound check higher since extra short is added
             return __instance.MaxPlayers > maxExpectedPlayers || __instance.NumImpostors < 1
                     || __instance.NumImpostors > 3 || __instance.KillDistance < 0
-                    || __instance.KillDistance >= GameOptionsData.KillDistances.Count
+                    || __instance.KillDistance >= LegacyGameOptions.KillDistances.Count
                     || __instance.PlayerSpeedMod <= 0f || __instance.PlayerSpeedMod > 3f;
         }
 
@@ -1160,7 +1147,7 @@ namespace TheOtherRoles {
         {
             return __instance.MaxPlayers > maxExpectedPlayers || __instance.NumImpostors < 1
                     || __instance.NumImpostors > 3 || __instance.KillDistance < 0
-                    || __instance.KillDistance >= GameOptionsData.KillDistances.Count
+                    || __instance.KillDistance >= LegacyGameOptions.KillDistances.Count
                     || __instance.PlayerSpeedMod <= 0f || __instance.PlayerSpeedMod > 3f;
         }
 
@@ -1203,7 +1190,7 @@ namespace TheOtherRoles {
                 else {
                     index = GameOptionsManager.Instance.currentHideNSeekGameOptions.KillDistance;
                 }
-                value = GameOptionsData.KillDistanceStrings[index];
+                value = LegacyGameOptions.KillDistanceStrings[index];
             }
         }
 
@@ -1222,15 +1209,15 @@ namespace TheOtherRoles {
 
         public static void addKillDistance()
         {
-            GameOptionsData.KillDistances = new(new float[] { 0.5f, 1f, 1.8f, 2.5f });
-            GameOptionsData.KillDistanceStrings = new(new string[] { "Very Short", "Short", "Medium", "Long" });
+            LegacyGameOptions.KillDistances = new(new float[] { 0.5f, 1f, 1.8f, 2.5f });
+            LegacyGameOptions.KillDistanceStrings = new(new string[] { "Very Short", "Short", "Medium", "Long" });
         }
 
         [HarmonyPatch(typeof(StringGameSetting), nameof(StringGameSetting.GetValueString))]
         [HarmonyPrefix]
         public static bool AjdustStringForViewPanel(StringGameSetting __instance, float value, ref string __result) {
             if (__instance.OptionName != Int32OptionNames.KillDistance) return true;
-            __result = GameOptionsData.KillDistanceStrings[(int)value];
+            __result = LegacyGameOptions.KillDistanceStrings[(int)value];
             return false;
         }
     }
@@ -1269,7 +1256,7 @@ namespace TheOtherRoles {
                 HudManagerUpdate.ToggleSettings(HudManager.Instance);
             if (Input.GetKeyDown(KeyCode.F2) && LobbyBehaviour.Instance)
                 HudManagerUpdate.ToggleSummary(HudManager.Instance);
-            if (TheOtherRolesPlugin.optionsPage >= GameOptionsDataPatch.maxPage) TheOtherRolesPlugin.optionsPage = 0;
+            if (TheOtherRolesPlugin.optionsPage >= LegacyGameOptionsPatch.maxPage) TheOtherRolesPlugin.optionsPage = 0;
         }
     }
 
@@ -1277,86 +1264,11 @@ namespace TheOtherRoles {
     //This class is taken and adapted from Town of Us Reactivated, https://github.com/eDonnes124/Town-Of-Us-R/blob/master/source/Patches/CustomOption/Patches.cs, Licensed under GPLv3
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
     public class HudManagerUpdate {
-        private static GameObject GameSettingsObject;
-        private static TextMeshPro GameSettings;
-        public static float
-            MinX,/*-5.3F*/
-            OriginalY = 2.9F,
-            MinY = 2.9F;
-
-        public static Scroller Scroller;
-        private static Vector3 LastPosition;
-        private static float lastAspect;
-        private static bool setLastPosition = false;
-
-        public static void Prefix(HudManager __instance) {
-            if (GameSettings?.transform == null) return;
-
-            // Sets the MinX position to the left edge of the screen + 0.1 units
-            Rect safeArea = Screen.safeArea;
-            float aspect = Mathf.Min((Camera.main).aspect, safeArea.width / safeArea.height);
-            float safeOrthographicSize = CameraSafeArea.GetSafeOrthographicSize(Camera.main);
-            MinX = 0.1f - safeOrthographicSize * aspect;
-
-            if (!setLastPosition || aspect != lastAspect) {
-                LastPosition = new Vector3(MinX, MinY);
-                lastAspect = aspect;
-                setLastPosition = true;
-                if (Scroller != null) Scroller.ContentXBounds = new FloatRange(MinX, MinX);                
-            }
-
-            CreateScroller(__instance);
-
-            Scroller.gameObject.SetActive(GameSettings.gameObject.activeSelf);
-
-            if (!Scroller.gameObject.active) return;
-
-            var rows = GameSettings.text.Count(c => c == '\n');
-            float LobbyTextRowHeight = 0.06F;
-            var maxY = Mathf.Max(MinY, rows * LobbyTextRowHeight + (rows - 38) * LobbyTextRowHeight);
-
-            Scroller.ContentYBounds = new FloatRange(MinY, maxY);
-
-            // Prevent scrolling when the player is interacting with a menu
-            if (PlayerControl.LocalPlayer.CanMove != true) {
-                GameSettings.transform.localPosition = LastPosition;
-
-                return;
-            }
-
-            if (GameSettings.transform.localPosition.x != MinX ||
-                GameSettings.transform.localPosition.y < MinY) return;
-
-            LastPosition = GameSettings.transform.localPosition;
-        }
-
-        private static void CreateScroller(HudManager __instance) {
-            if (Scroller != null) return;
-
-            Transform target = GameSettings.transform;
-
-            Scroller = new GameObject("SettingsScroller").AddComponent<Scroller>();
-            Scroller.transform.SetParent(GameSettings.transform.parent);
-            Scroller.gameObject.layer = 5;
-
-            Scroller.transform.localScale = Vector3.one;
-            Scroller.allowX = false;
-            Scroller.allowY = true;
-            Scroller.active = true;
-            Scroller.velocity = new Vector2(0, 0);
-            Scroller.ScrollbarYBounds = new FloatRange(0, 0);
-            Scroller.ContentXBounds = new FloatRange(MinX, MinX);
-            Scroller.enabled = true;
-
-            Scroller.Inner = target;
-            target.SetParent(Scroller.transform);
-        }
-
         [HarmonyPrefix]
         public static void Prefix2(HudManager __instance) {
             if (!settingsTMPs[0]) return;
             foreach (var tmp in settingsTMPs) tmp.text = "";
-            var settingsString = GameOptionsDataPatch.buildAllOptions(hideExtras: true);
+            var settingsString = LegacyGameOptionsPatch.buildAllOptions(hideExtras: true);
             var blocks = settingsString.Split("\n\n", StringSplitOptions.RemoveEmptyEntries); ;
             string curString = "";
             string curBlock;

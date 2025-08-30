@@ -18,8 +18,8 @@ using static StarGen;
 
 namespace TheOtherRoles.Modules {
     public class ModUpdater : MonoBehaviour {
-        public const string RepositoryOwner = "TheOtherRolesAU";
-        public const string RepositoryName = "TheOtherRoles";
+        public const string RepositoryOwner = "fangkuaiclub";
+        public const string RepositoryName = "TheOtherRoles-X";
         public static ModUpdater Instance { get; private set; }
 
         public ModUpdater(IntPtr ptr) : base(ptr) { }
@@ -112,7 +112,7 @@ namespace TheOtherRoles.Modules {
             if (File.Exists(filePath + ".old")) File.Delete(filePath + "old");
             if (File.Exists(filePath)) File.Move(filePath, filePath + ".old");
 
-            var persistTask = File.WriteAllBytesAsync(filePath, www.downloadHandler.data);
+            var persistTask = File.WriteAllBytesAsync(filePath, www.downloadHandler.GetUnstrippedData());
             var hasError = false;
             while (!persistTask.IsCompleted) {
                 if (persistTask.Exception != null) {

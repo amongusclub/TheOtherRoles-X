@@ -15,6 +15,7 @@ using TheOtherRoles.CustomGameModes;
 using Reactor.Utilities.Extensions;
 using AmongUs.GameOptions;
 using TheOtherRoles.Patches;
+using UnityEngine.Networking;
 
 namespace TheOtherRoles {
 
@@ -652,6 +653,15 @@ namespace TheOtherRoles {
             return (long)value;
         }
 
+        public static byte[] GetUnstrippedData(this DownloadHandler dh)
+        {
+            var nativeData = dh.GetNativeData();
+            if (nativeData.IsCreated)
+                return nativeData.ToArray();
+            return null;
+        }
+
+#if PC
         public static async Task checkBeta() {
             if (TheOtherRolesPlugin.betaDays > 0) {
                 TheOtherRolesPlugin.Logger.LogMessage($"Beta check");
@@ -680,6 +690,7 @@ namespace TheOtherRoles {
                 } else TheOtherRolesPlugin.Logger.LogMessage($"Beta will remain runnable for {TheOtherRolesPlugin.betaDays - (now - compileTime)?.TotalDays} days!");
             }
         }
+#endif
 
         public static bool hasImpVision(NetworkedPlayerInfo player) {
             return player.Role.IsImpostor

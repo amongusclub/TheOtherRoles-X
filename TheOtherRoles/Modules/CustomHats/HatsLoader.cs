@@ -69,7 +69,7 @@ public class HatsLoader : MonoBehaviour
         var www = new UnityWebRequest();
         www.SetMethod(UnityWebRequest.UnityWebRequestMethod.Get);
         fileName = fileName.Replace(" ", "%20");
-        TheOtherRolesPlugin.Logger.LogMessage($"downloading hat: {fileName}");
+        TheOtherRolesPlugin.Logger.LogMessage($"downloading hat {HatsDirectory} : {fileName}");
         www.SetUrl($"{RepositoryUrl}/hats/{fileName}");
         www.downloadHandler = new DownloadHandlerBuffer();
         var operation = www.SendWebRequest();
@@ -87,7 +87,7 @@ public class HatsLoader : MonoBehaviour
 
         var filePath = Path.Combine(HatsDirectory, fileName);
         filePath = filePath.Replace("%20", " ");
-        var persistTask = File.WriteAllBytesAsync(filePath, www.downloadHandler.data);
+        var persistTask = File.WriteAllBytesAsync(filePath, www.downloadHandler.GetUnstrippedData());
         while (!persistTask.IsCompleted)
         {
             if (persistTask.Exception != null)
