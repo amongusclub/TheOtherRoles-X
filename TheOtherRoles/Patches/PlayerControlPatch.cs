@@ -93,7 +93,7 @@ namespace TheOtherRoles.Patches {
         }
 
         static void setPetVisibility() {
-            bool localalive = PlayerControl.LocalPlayer.Data.IsDead;
+            bool localalive = !PlayerControl.LocalPlayer.Data.IsDead;
             foreach (var player in PlayerControl.AllPlayerControls)
             {
                 bool playeralive = !player.Data.IsDead;

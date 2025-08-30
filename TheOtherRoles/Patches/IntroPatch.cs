@@ -13,7 +13,12 @@ using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles.Patches {
-    [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
+#if PC
+        [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
+#endif
+#if ANDROID
+    [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
+#endif
     class IntroCutsceneOnDestroyPatch
     {
         public static PoolablePlayer playerPrefab;
@@ -150,58 +155,6 @@ namespace TheOtherRoles.Patches {
 
     [HarmonyPatch]
     class IntroPatch {
-        public static IEnumerator ShowTeam(IntroCutscene __instance, Il2CppSystem.Collections.Generic.List<PlayerControl> teamToShow, float duration)
-        {
-            if (__instance.overlayHandle == null)
-            {
-                __instance.overlayHandle = DestroyableSingleton<DualshockLightManager>.Instance.AllocateLight();
-            }
-            yield return ShipStatus.Instance.CosmeticsCache.PopulateFromPlayers();
-            if (!teamToShow.TrueForAll((Il2CppSystem.Predicate<PlayerControl>)(p => p.Data.Role.IsImpostor)))
-            {
-                __instance.BeginCrewmate(teamToShow);
-                __instance.overlayHandle.color = Palette.CrewmateBlue;
-            }
-            else
-            {
-                __instance.BeginImpostor(teamToShow);
-                __instance.overlayHandle.color = Palette.ImpostorRed;
-            }
-            Color c = __instance.TeamTitle.color;
-            Color fade = Color.black;
-            Color impColor = Color.white;
-            Vector3 titlePos = __instance.TeamTitle.transform.localPosition;
-            float timer = 0f;
-            while (timer < duration)
-            {
-                timer += Time.deltaTime;
-                float num = Mathf.Min(1f, timer / duration);
-                __instance.Foreground.material.SetFloat("_Rad", __instance.ForegroundRadius.ExpOutLerp(num * 2f));
-                fade.a = Mathf.Lerp(1f, 0f, num * 3f);
-                __instance.FrontMost.color = fade;
-                c.a = Mathf.Clamp(FloatRange.ExpOutLerp(num, 0f, 1f), 0f, 1f);
-                __instance.TeamTitle.color = c;
-                __instance.RoleText.color = c;
-                impColor.a = Mathf.Lerp(0f, 1f, (num - 0.3f) * 3f);
-                __instance.ImpostorText.color = impColor;
-                titlePos.y = 2.7f - num * 0.3f;
-                __instance.TeamTitle.transform.localPosition = titlePos;
-                __instance.overlayHandle.color.SetAlpha(Mathf.Min(1f, timer * 2f));
-                yield return null;
-            }
-            timer = 0f;
-            while (timer < 1f)
-            {
-                timer += Time.deltaTime;
-                float num2 = timer / 1f;
-                fade.a = Mathf.Lerp(0f, 1f, num2 * 3f);
-                __instance.FrontMost.color = fade;
-                __instance.overlayHandle.color.SetAlpha(1f - fade.a);
-                yield return null;
-            }
-            yield break;
-        }
-
         public static IEnumerator CoBegin(IntroCutscene __instance)
         {
             SoundManager.Instance.PlaySound(__instance.IntroStinger, false, 1f, null);
@@ -239,7 +192,7 @@ namespace TheOtherRoles.Patches {
                     __instance.ImpostorText.text = __instance.ImpostorText.text.Replace("[FF1919FF]", "<color=#FF1919FF>");
                     __instance.ImpostorText.text = __instance.ImpostorText.text.Replace("[]", "</color>");
                 }
-                yield return ShowTeam(__instance, list, 3f);
+                yield return __instance.ShowTeam(list, 3f);
                 yield return RoleDraft.CoSelectRoles(__instance).WrapToIl2Cpp();
                 yield return __instance.ShowRole();
             }
@@ -446,10 +399,15 @@ namespace TheOtherRoles.Patches {
             }
         }
 
+#if PC
         [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
+#endif
+#if ANDROID
+        [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__40), nameof(IntroCutscene._ShowRole_d__40.MoveNext))]
+#endif
         class SetUpRoleTextPatch {
             static int seed = 0;
-            static public void SetRoleTexts(IntroCutscene._ShowRole_d__41 __instance) {
+            static public void SetRoleTexts(IntroCutscene __instance) {
                 // Don't override the intro of the vanilla roles
                 List<RoleInfo> infos = RoleInfo.getRoleInfoForPlayer(PlayerControl.LocalPlayer);
                 RoleInfo roleInfo = infos.Where(info => !info.isModifier).FirstOrDefault();
@@ -464,34 +422,38 @@ namespace TheOtherRoles.Patches {
                     roleInfo = roleInfos[rnd.Next(roleInfos.Count)];
                 }
 
-                __instance.__4__this.RoleBlurbText.text = "";
+                __instance.RoleBlurbText.text = "";
                 if (roleInfo != null) {
-                    __instance.__4__this.RoleText.text = roleInfo.name;
-                    __instance.__4__this.RoleText.color = roleInfo.color;
-                    __instance.__4__this.RoleBlurbText.text = roleInfo.introDescription;
-                    __instance.__4__this.RoleBlurbText.color = roleInfo.color;
+                    __instance.RoleText.text = roleInfo.name;
+                    __instance.RoleText.color = roleInfo.color;
+                    __instance.RoleBlurbText.text = roleInfo.introDescription;
+                    __instance.RoleBlurbText.color = roleInfo.color;
                 }
                 if (modifierInfo != null) {
                     if (modifierInfo.roleId != RoleId.Lover)
-                        __instance.__4__this.RoleBlurbText.text += Helpers.cs(modifierInfo.color, $"\n{modifierInfo.introDescription}");
+                        __instance.RoleBlurbText.text += Helpers.cs(modifierInfo.color, $"\n{modifierInfo.introDescription}");
                     else {
                         PlayerControl otherLover = PlayerControl.LocalPlayer == Lovers.lover1 ? Lovers.lover2 : Lovers.lover1;
-                        __instance.__4__this.RoleBlurbText.text += Helpers.cs(Lovers.color, $"\n♥ You are in love with {otherLover?.Data?.PlayerName ?? ""} ♥");
+                        __instance.RoleBlurbText.text += Helpers.cs(Lovers.color, $"\n♥ You are in love with {otherLover?.Data?.PlayerName ?? ""} ♥");
                     }
                 }
                 if (Deputy.knowsSheriff && Deputy.deputy != null && Sheriff.sheriff != null) {
                     if (infos.Any(info => info.roleId == RoleId.Sheriff))
-                        __instance.__4__this.RoleBlurbText.text += Helpers.cs(Sheriff.color, $"\nYour Deputy is {Deputy.deputy?.Data?.PlayerName ?? ""}");
+                        __instance.RoleBlurbText.text += Helpers.cs(Sheriff.color, $"\nYour Deputy is {Deputy.deputy?.Data?.PlayerName ?? ""}");
                     else if (infos.Any(info => info.roleId == RoleId.Deputy))
-                        __instance.__4__this.RoleBlurbText.text += Helpers.cs(Sheriff.color, $"\nYour Sheriff is {Sheriff.sheriff?.Data?.PlayerName ?? ""}");
+                        __instance.RoleBlurbText.text += Helpers.cs(Sheriff.color, $"\nYour Sheriff is {Sheriff.sheriff?.Data?.PlayerName ?? ""}");
                 }
             }
-            public static bool Prefix(IntroCutscene._ShowRole_d__41 __instance) {
+#if PC
+            static public void SetRoleTexts(IntroCutscene._ShowRole_d__41 __instance) {
+#endif
+#if ANDROID
+            static public void Prefix(IntroCutscene._ShowRole_d__40 __instance) {
+#endif
                 seed = rnd.Next(5000);
                 FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(1f, new Action<float>((p) => {
-                    SetRoleTexts(__instance);
+                    SetRoleTexts(__instance.__4__this);
                 })));
-                return true;
             }
         }
 

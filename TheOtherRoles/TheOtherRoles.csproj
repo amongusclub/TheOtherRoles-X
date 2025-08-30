@@ -10,7 +10,8 @@
         <PlatformTarget>AnyCPU</PlatformTarget>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <Platforms>AnyCPU</Platforms>
-        <Configurations>PC;Android</Configurations>
+		<DebugType>embedded</DebugType>
+		<Configurations>PC;Android</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,7 +22,7 @@
 		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.4.15" />
 		<!--<PackageReference Include="AmongUs.GameLibs.Android" Version="2025.6.10" />-->
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" />
-		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.738" />
+		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" />
         <PackageReference Include="Reactor" Version="2.3.1" />
     </ItemGroup>
    

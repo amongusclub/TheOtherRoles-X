@@ -25,6 +25,7 @@ namespace TheOtherRoles.Modules {
             // Force Reload of SoundEffectHolder
             SoundEffectsManager.Load();
 
+#if PC
             var template = GameObject.Find("ExitGameButton");
             var template2 = GameObject.Find("CreditsButton");
             if (template == null || template2 == null) return;
@@ -37,7 +38,16 @@ namespace TheOtherRoles.Modules {
             template2.GetComponent<AspectPosition>().anchorPoint = new Vector2(0.378f, 0.5f);
             template2.transform.FindChild("FontPlacer").transform.localScale = new Vector3(1.8f, 0.9f, 0.9f);
             template2.transform.FindChild("FontPlacer").transform.localPosition = new Vector3(-1.1f, 0f, 0f);
+#endif
+#if ANDROID
+            var template = GameObject.Find("CreditsButton");
+            if (template == null) return;
 
+            template.transform.localScale = new Vector3(0.42f, 0.84f, 0.84f);
+            template.GetComponent<AspectPosition>().anchorPoint = new Vector2(0.378f, 0.5f);
+            template.transform.FindChild("FontPlacer").transform.localScale = new Vector3(1.8f, 0.9f, 0.9f);
+            template.transform.FindChild("FontPlacer").transform.localPosition = new Vector3(-1.1f, 0f, 0f);
+#endif
 
 
             var buttonDiscord = UnityEngine.Object.Instantiate(template, template.transform.parent);

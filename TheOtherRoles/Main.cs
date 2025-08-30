@@ -91,6 +91,10 @@ namespace TheOtherRoles
         }
 
         public override void Load() {
+#if ANDROID
+            ResolutionManager.SetResolution(1820, 900, true);
+            // Ensure the normal display of some interfaces and make the Android version look clearer, but the screen may be flattened. I have been considering whether to enable it or not
+#endif
             Logger = Log;
             Instance = this;
 
