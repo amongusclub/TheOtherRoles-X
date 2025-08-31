@@ -1150,7 +1150,11 @@ internal static class HudManagerStartPatch
             () => { return PlayerControl.LocalPlayer.CanMove && !Vampire.localPlacedGarlic; },
             () => { },
             Vampire.getGarlicButtonSprite(),
+#if PC
             new Vector3(0, -0.06f, 0),
+#else
+            new Vector3(1f, -0.06f, 0),
+#endif
             __instance,
             null,
             true,
