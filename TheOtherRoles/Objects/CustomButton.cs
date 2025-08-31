@@ -67,7 +67,7 @@ namespace TheOtherRoles.Objects {
             this.Sprite = Sprite;
             this.mirror = mirror;
             this.hotkey = hotkey;
-            this.buttonText = buttonText;
+            this.buttonText = ModTranslation.getString(buttonText);
             originalHotkey = hotkey;
             Timer = 16.2f;
             buttons.Add(this);

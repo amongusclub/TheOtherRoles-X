@@ -1,13 +1,13 @@
-using HarmonyLib;
-using Hazel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using static TheOtherRoles.TheOtherRoles;
+using HarmonyLib;
+using Hazel;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
-using System;
-
 using TheOtherRoles.Utilities;
 using UnityEngine;
+using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles.Patches {
     [HarmonyPatch(typeof(ExileController), nameof(ExileController.BeginForGameplay))]
@@ -300,7 +300,7 @@ namespace TheOtherRoles.Patches {
                     if (id == StringNames.ImpostorsRemainP || id == StringNames.ImpostorsRemainS) {
                         if (Jester.jester != null && player.PlayerId == Jester.jester.PlayerId) __result = "";
                     }
-                    if (Tiebreaker.isTiebreak) __result += " (Tiebreaker)";
+                    if (Tiebreaker.isTiebreak) __result += $" ({ModTranslation.getString("modifierTieBreaker")})";
                     Tiebreaker.isTiebreak = false;
                 }
             } catch {

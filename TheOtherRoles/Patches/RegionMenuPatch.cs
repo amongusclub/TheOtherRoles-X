@@ -151,7 +151,7 @@ namespace TheOtherRoles.Patches {
                 comp.fontSize = 0.2f;
                 serverWarning.transform.position = new Vector3(5f, 1f, -200f);
                 __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
-                    comp.text = Helpers.cs(Color.red, "Vanilla Servers Are Currently Not Compatible With TOR");
+                    comp.text = Helpers.ColorString(Color.red, "Vanilla Servers Are Currently Not Compatible With TOR");
                     serverWarning.transform.position = new Vector3(0f, 1f, -200f);
                 })));
                 serverWarning.SetActive(true);

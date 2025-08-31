@@ -198,15 +198,15 @@ namespace TheOtherRoles {
             if (roleInfo.name == "Jackal") 
             {
                 var getSidekickText = Jackal.canCreateSidekick ? " and recruit a Sidekick" : "";
-                return cs(roleInfo.color, $"{roleInfo.name}: Kill everyone{getSidekickText}");  
+                return ColorString(roleInfo.color, $"{roleInfo.name}: Kill everyone{getSidekickText}");  
             }
 
             if (roleInfo.name == "Invert") 
             {
-                return cs(roleInfo.color, $"{roleInfo.name}: {roleInfo.shortDescription} ({Invert.meetings})");
+                return ColorString(roleInfo.color, $"{roleInfo.name}: {roleInfo.shortDescription} ({Invert.meetings})");
             }
             
-            return cs(roleInfo.color, $"{roleInfo.name}: {roleInfo.shortDescription}");
+            return ColorString(roleInfo.color, $"{roleInfo.name}: {roleInfo.shortDescription}");
         }
 
         public static bool isD(byte playerId) {
@@ -311,7 +311,7 @@ namespace TheOtherRoles {
             return t.GetString(key, parts);
         }
 
-        public static string cs(Color c, string s) {
+        public static string ColorString(Color c, string s) {
             return string.Format("<color=#{0:X2}{1:X2}{2:X2}{3:X2}>{4}</color>", ToByte(c.r), ToByte(c.g), ToByte(c.b), ToByte(c.a), s);
         }
 
@@ -408,7 +408,7 @@ namespace TheOtherRoles {
             FastDestroyableSingleton<HudManager>.Instance.FullScreen.enabled = true;
             // Message Text
             TMPro.TextMeshPro messageText = GameObject.Instantiate(FastDestroyableSingleton<HudManager>.Instance.KillButton.cooldownTimerText, FastDestroyableSingleton<HudManager>.Instance.transform);
-            messageText.text = message;
+            messageText.text = message.Translate();
             messageText.enableWordWrapping = false;
             messageText.transform.localScale = Vector3.one * 0.5f;
             messageText.transform.localPosition += new Vector3(0f, 2f, -69f);
@@ -766,6 +766,20 @@ namespace TheOtherRoles {
             catch
             {
                 return "";
+            }
+        }
+
+        public static bool isChinese()
+        {
+            try
+            {
+                var name = CultureInfo.CurrentUICulture.Name;
+                if (name.StartsWith("zh")) return true;
+                return false;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

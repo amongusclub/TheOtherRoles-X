@@ -1,26 +1,26 @@
 ﻿global using Il2CppInterop.Runtime;
 global using Il2CppInterop.Runtime.Attributes;
+global using Il2CppInterop.Runtime.Injection;
 global using Il2CppInterop.Runtime.InteropTypes;
 global using Il2CppInterop.Runtime.InteropTypes.Arrays;
-global using Il2CppInterop.Runtime.Injection;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AmongUs.Data;
+using AmongUs.Data.Player;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Hazel;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using UnityEngine;
-using TheOtherRoles.Modules;
-using TheOtherRoles.Utilities;
 using Il2CppSystem.Security.Cryptography;
 using Il2CppSystem.Text;
 using Reactor.Networking.Attributes;
-using AmongUs.Data;
+using Reactor.Utilities;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Modules.CustomHats;
-using AmongUs.Data.Player;
+using TheOtherRoles.Utilities;
+using UnityEngine;
 
 namespace TheOtherRoles
 {
@@ -91,17 +91,20 @@ namespace TheOtherRoles
         }
 
         public override void Load() {
-#if ANDROID
+/*#if ANDROID
             ResolutionManager.SetResolution(1820, 900, true);
             // Ensure the normal display of some interfaces and make the Android version look clearer, but the screen may be flattened. I have been considering whether to enable it or not
-#endif
+#endif*/
             Logger = Log;
             Instance = this;
 
+            ModTranslation.Load();
 #if PC
             _ = Helpers.checkBeta(); // Exit if running an expired beta
-#endif
             _ = Patches.CredentialsPatch.MOTD.loadMOTDs();
+#else
+            Patches.CredentialsPatch.MOTD.loadMOTDs();
+#endif
 
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
             GhostsSeeInformation = Config.Bind("Custom", "Ghosts See Remaining Tasks", true);

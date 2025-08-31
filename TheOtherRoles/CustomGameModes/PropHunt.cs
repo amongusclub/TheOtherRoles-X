@@ -155,7 +155,7 @@ namespace TheOtherRoles.CustomGameModes {
                     int minutes = (int)relevantTimer / 60;
                     int seconds = (int)relevantTimer % 60;
                     string suffix = $" {minutes:00}:{seconds:00}";
-                    timerText.text = Helpers.cs(timerRunning ? Color.blue : Color.red, suffix);
+                    timerText.text = Helpers.ColorString(timerRunning ? Color.blue : Color.red, suffix);
                     timerText.outlineColor = Color.white;
                     timerText.outlineWidth = 0.1f;
                     timerText.color = timerRunning ? Color.blue : Color.red;
@@ -182,15 +182,15 @@ namespace TheOtherRoles.CustomGameModes {
                 var poolablePlayer = TORMapOptions.playerIcons[pc.PlayerId];
                 if (pc.Data.IsDead) {
                     poolablePlayer.setSemiTransparent(true, 0.25f);
-                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.DisabledGrey, pc.Data.PlayerName); ;
+                    poolablePlayer.cosmetics.nameText.text = Helpers.ColorString(Palette.DisabledGrey, pc.Data.PlayerName); ;
                 } else if (pc.Data.Role.IsImpostor) {
-                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.ImpostorRed, pc.Data.PlayerName);
+                    poolablePlayer.cosmetics.nameText.text = Helpers.ColorString(Palette.ImpostorRed, pc.Data.PlayerName);
                     poolablePlayer.cosmetics.currentBodySprite.BodySprite.material.SetFloat("_Outline", 2f);
                     poolablePlayer.cosmetics.currentBodySprite.BodySprite.material.SetColor("_OutlineColor", Palette.ImpostorRed);
                     poolablePlayer.cosmetics.nameText.fontSize = 4;
                 } else {
                     // Display Prop
-                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.CrewmateBlue, pc.Data.PlayerName);
+                    poolablePlayer.cosmetics.nameText.text = Helpers.ColorString(Palette.CrewmateBlue, pc.Data.PlayerName);
                 }
                 // update currently revealed:
                 if (isCurrentlyRevealed.ContainsKey(pc.PlayerId)) {

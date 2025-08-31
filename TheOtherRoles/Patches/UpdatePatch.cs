@@ -1,14 +1,14 @@
-using HarmonyLib;
 using System;
-using UnityEngine;
-using static TheOtherRoles.TheOtherRoles;
-using TheOtherRoles.Objects;
 using System.Collections.Generic;
 using System.Linq;
-
-using TheOtherRoles.Utilities;
-using TheOtherRoles.CustomGameModes;
 using AmongUs.GameOptions;
+using HarmonyLib;
+using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.Modules;
+using TheOtherRoles.Objects;
+using TheOtherRoles.Utilities;
+using UnityEngine;
+using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles.Patches {
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
@@ -174,24 +174,24 @@ namespace TheOtherRoles.Patches {
             if (PlayerControl.LocalPlayer != null && PlayerControl.LocalPlayer.Data.Role.IsImpostor) {
                 foreach (PlayerControl player in PlayerControl.AllPlayerControls)
                     if (Godfather.godfather != null && Godfather.godfather == player)
-                            player.cosmetics.nameText.text = player.Data.PlayerName + " (G)";
+                            player.cosmetics.nameText.text = player.Data.PlayerName + "setNameTagsG".Translate();
                     else if (Mafioso.mafioso != null && Mafioso.mafioso == player)
-                            player.cosmetics.nameText.text = player.Data.PlayerName + " (M)";
+                            player.cosmetics.nameText.text = player.Data.PlayerName + "setNameTagsM".Translate();
                     else if (Janitor.janitor != null && Janitor.janitor == player)
-                            player.cosmetics.nameText.text = player.Data.PlayerName + " (J)";
+                            player.cosmetics.nameText.text = player.Data.PlayerName + "setNameTagsJ".Translate();
                 if (MeetingHud.Instance != null)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
                         if (Godfather.godfather != null && Godfather.godfather.PlayerId == player.TargetPlayerId)
-                            player.NameText.text = Godfather.godfather.Data.PlayerName + " (G)";
+                            player.NameText.text = Godfather.godfather.Data.PlayerName + "setNameTagsG".Translate();
                         else if (Mafioso.mafioso != null && Mafioso.mafioso.PlayerId == player.TargetPlayerId)
-                            player.NameText.text = Mafioso.mafioso.Data.PlayerName + " (M)";
+                            player.NameText.text = Mafioso.mafioso.Data.PlayerName + "setNameTagsM".Translate();
                         else if (Janitor.janitor != null && Janitor.janitor.PlayerId == player.TargetPlayerId)
-                            player.NameText.text = Janitor.janitor.Data.PlayerName + " (J)";
+                            player.NameText.text = Janitor.janitor.Data.PlayerName + "setNameTagsJ".Translate();
             }
 
             // Lovers
             if (Lovers.lover1 != null && Lovers.lover2 != null && (Lovers.lover1 == PlayerControl.LocalPlayer || Lovers.lover2 == PlayerControl.LocalPlayer)) {
-                string suffix = Helpers.cs(Lovers.color, " ♥");
+                string suffix = Helpers.ColorString(Lovers.color, " ♥");
                 Lovers.lover1.cosmetics.nameText.text += suffix;
                 Lovers.lover2.cosmetics.nameText.text += suffix;
 
@@ -205,7 +205,7 @@ namespace TheOtherRoles.Patches {
             if ((Lawyer.lawyer != null && Lawyer.target != null && Lawyer.lawyer == PlayerControl.LocalPlayer)) {
                 Color color = Lawyer.color;
                 PlayerControl target = Lawyer.target;
-                string suffix = Helpers.cs(color, " §");
+                string suffix = Helpers.ColorString(color, " §");
                 target.cosmetics.nameText.text += suffix;
 
                 if (MeetingHud.Instance != null)
@@ -216,7 +216,7 @@ namespace TheOtherRoles.Patches {
 
             // Former Thief
             if (Thief.formerThief != null && (Thief.formerThief == PlayerControl.LocalPlayer || PlayerControl.LocalPlayer.Data.IsDead)) {
-                string suffix = Helpers.cs(Thief.color, " $");
+                string suffix = Helpers.ColorString(Thief.color, " $");
                 Thief.formerThief.cosmetics.nameText.text += suffix;
                 if (MeetingHud.Instance != null)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
@@ -228,7 +228,7 @@ namespace TheOtherRoles.Patches {
             if (PlayerControl.LocalPlayer != null && MeetingHud.Instance != null && TORMapOptions.showLighterDarker) {
                 foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates) {
                     var target = Helpers.playerById(player.TargetPlayerId);
-                    if (target != null)  player.NameText.text += $" ({(Helpers.isLighterColor(target) ? "L" : "D")})";
+                    if (target != null)  player.NameText.text += $" ({(Helpers.isLighterColor(target) ? "colorLightMax".Translate() : "colorDarkMax".Translate())})";
                 }
             }
 
@@ -236,7 +236,7 @@ namespace TheOtherRoles.Patches {
             if (MeetingHud.Instance != null && Medic.medic != null && Medic.shielded != null && Medic.shieldVisible(Medic.shielded)) {
                 foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
                     if (player.TargetPlayerId == Medic.shielded.PlayerId) {
-                        player.NameText.text = Helpers.cs(Medic.color, "[") + player.NameText.text + Helpers.cs(Medic.color, "]");
+                        player.NameText.text = Helpers.ColorString(Medic.color, "[") + player.NameText.text + Helpers.ColorString(Medic.color, "]");
                         // player.HighlightedFX.color = Medic.color;
                         // player.HighlightedFX.enabled = true;
                     }

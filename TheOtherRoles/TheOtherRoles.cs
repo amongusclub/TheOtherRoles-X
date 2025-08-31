@@ -1,16 +1,16 @@
-using System.Linq;
-using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using TheOtherRoles.Objects;
-
-using TheOtherRoles.Utilities;
-using TheOtherRoles.CustomGameModes;
-using static TheOtherRoles.TheOtherRoles;
+using System.Linq;
 using AmongUs.Data;
+using HarmonyLib;
 using Hazel;
 using Reactor.Utilities.Extensions;
+using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.Modules;
+using TheOtherRoles.Objects;
+using TheOtherRoles.Utilities;
+using UnityEngine;
+using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles
 {
@@ -1379,7 +1379,8 @@ namespace TheOtherRoles
     }
 
 
-    public static class Medium {
+    public static class Medium
+    {
         public static PlayerControl medium;
         public static DeadPlayer target;
         public static DeadPlayer soulTarget;
@@ -1396,7 +1397,8 @@ namespace TheOtherRoles
 
         private static Sprite soulSprite;
 
-        enum SpecialMediumInfo {
+        enum SpecialMediumInfo
+        {
             SheriffSuicide,
             ThiefSuicide,
             ActiveLoverDies,
@@ -1409,20 +1411,23 @@ namespace TheOtherRoles
             BodyCleaned,
         }
 
-        public static Sprite getSoulSprite() {
+        public static Sprite getSoulSprite()
+        {
             if (soulSprite) return soulSprite;
             soulSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Soul.png", 500f);
             return soulSprite;
         }
 
         private static Sprite question;
-        public static Sprite getQuestionSprite() {
+        public static Sprite getQuestionSprite()
+        {
             if (question) return question;
             question = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.MediumButton.png", 115f);
             return question;
         }
 
-        public static void clearAndReload() {
+        public static void clearAndReload()
+        {
             medium = null;
             target = null;
             soulTarget = null;
@@ -1436,100 +1441,117 @@ namespace TheOtherRoles
             chanceAdditionalInfo = CustomOptionHolder.mediumChanceAdditionalInfo.getSelection() / 10f;
         }
 
-        public static string getInfo(PlayerControl target, PlayerControl killer, DeadPlayer.CustomDeathReason deathReason) {
-            string msg = "";
+        public static string getInfo(PlayerControl target, PlayerControl killer, DeadPlayer.CustomDeathReason deathReason)
+        {
+            var msg = "";
 
-            List<SpecialMediumInfo> infos = new List<SpecialMediumInfo>();
+            var infos = new List<SpecialMediumInfo>();
             // collect fitting death info types.
             // suicides:
-            if (killer == target) {
-                if ((target == Sheriff.sheriff || target == Sheriff.formerSheriff) && deathReason != DeadPlayer.CustomDeathReason.LoverSuicide) infos.Add(SpecialMediumInfo.SheriffSuicide);
+            if (killer == target)
+            {
+                if ((target == Sheriff.sheriff || target == Sheriff.formerSheriff) &&
+                    deathReason != DeadPlayer.CustomDeathReason.LoverSuicide) infos.Add(SpecialMediumInfo.SheriffSuicide);
                 if (target == Lovers.lover1 || target == Lovers.lover2) infos.Add(SpecialMediumInfo.PassiveLoverSuicide);
-                if (target == Thief.thief && deathReason != DeadPlayer.CustomDeathReason.LoverSuicide) infos.Add(SpecialMediumInfo.ThiefSuicide);
-                if (target == Warlock.warlock && deathReason != DeadPlayer.CustomDeathReason.LoverSuicide) infos.Add(SpecialMediumInfo.WarlockSuicide);
-            } else {
-                if (target == Lovers.lover1 || target == Lovers.lover2) infos.Add(SpecialMediumInfo.ActiveLoverDies);
-                if (target.Data.Role.IsImpostor && killer.Data.Role.IsImpostor && Thief.formerThief != killer) infos.Add(SpecialMediumInfo.ImpostorTeamkill);
+                if (target == Thief.thief && deathReason != DeadPlayer.CustomDeathReason.LoverSuicide)
+                    infos.Add(SpecialMediumInfo.ThiefSuicide);
+                if (target == Warlock.warlock && deathReason != DeadPlayer.CustomDeathReason.LoverSuicide)
+                    infos.Add(SpecialMediumInfo.WarlockSuicide);
             }
-            if (target == Sidekick.sidekick && (killer == Jackal.jackal || Jackal.formerJackals.Any(x => x.PlayerId == killer.PlayerId))) infos.Add(SpecialMediumInfo.JackalKillsSidekick);
-            if (target == Lawyer.lawyer && killer == Lawyer.target) infos.Add(SpecialMediumInfo.LawyerKilledByClient);
-            if (Medium.target.wasCleaned) infos.Add(SpecialMediumInfo.BodyCleaned);
-            
-            if (infos.Count > 0) {
-                var selectedInfo = infos[rnd.Next(infos.Count)];
-                switch (selectedInfo) {
-                    case SpecialMediumInfo.SheriffSuicide:
-                        msg = "Yikes, that Sheriff shot backfired.";
-                        break;
-                    case SpecialMediumInfo.WarlockSuicide:
-                        msg = "MAYBE I cursed the person next to me and killed myself. Oops.";
-                        break;
-                    case SpecialMediumInfo.ThiefSuicide:
-                        msg = "I tried to steal the gun from their pocket, but they were just happy to see me.";
-                        break;
-                    case SpecialMediumInfo.ActiveLoverDies:
-                        msg = "I wanted to get out of this toxic relationship anyways.";
-                        break;
-                    case SpecialMediumInfo.PassiveLoverSuicide:
-                        msg = "The love of my life died, thus with a kiss I die.";
-                        break;
-                    case SpecialMediumInfo.LawyerKilledByClient:
-                        msg = "My client killed me. Do I still get paid?";
-                        break;
-                    case SpecialMediumInfo.JackalKillsSidekick:
-                        msg = "First they sidekicked me, then they killed me. At least I don't need to do tasks anymore.";
-                        break;
-                    case SpecialMediumInfo.ImpostorTeamkill:
-                        msg = "I guess they confused me for the Spy, is there even one?";
-                        break;
-                    case SpecialMediumInfo.BodyCleaned:
-                        msg = "Is my dead body some kind of art now or... aaand it's gone.";
-                        break;
-                }
-            } else {
-                int randomNumber = rnd.Next(4);
-                string typeOfColor = Helpers.isLighterColor(Medium.target.killerIfExisting) ? "lighter" : "darker";
-                float timeSinceDeath = ((float)(Medium.meetingStartTime - Medium.target.timeOfDeath).TotalMilliseconds);
-                var roleString = RoleInfo.GetRolesString(Medium.target.player, false);
-                if (randomNumber == 0) {
-                    if (!roleString.Contains("Impostor") && !roleString.Contains("Crewmate"))
-                        msg = "If my role hasn't been saved, there's no " + roleString + " in the game anymore.";
-                    else
-                        msg = "I was a " + roleString + " without another role."; 
-                } else if (randomNumber == 1) msg = "I'm not sure, but I guess a " + typeOfColor + " color killed me.";
-                else if (randomNumber == 2) msg = "If I counted correctly, I died " + Math.Round(timeSinceDeath / 1000) + "s before the next meeting started.";
-                else msg = "It seems like my killer is the " + RoleInfo.GetRolesString(Medium.target.killerIfExisting, false, false, true) + ".";
+            else
+            {
+                if (target == Lovers.lover1 || target == Lovers.lover2) infos.Add(SpecialMediumInfo.ActiveLoverDies);
+                if (target.Data.Role.IsImpostor && killer.Data.Role.IsImpostor && Thief.formerThief != killer)
+                    infos.Add(SpecialMediumInfo.ImpostorTeamkill);
             }
 
-            if (rnd.NextDouble() < chanceAdditionalInfo) {
-                int count = 0;
-                string condition = "";
+            if (target == Sidekick.sidekick &&
+                (killer == Jackal.jackal || Jackal.formerJackals.Any(x => x.PlayerId == killer.PlayerId)))
+                infos.Add(SpecialMediumInfo.JackalKillsSidekick);
+            if (target == Lawyer.lawyer && killer == Lawyer.target) infos.Add(SpecialMediumInfo.LawyerKilledByClient);
+            if (Medium.target.wasCleaned) infos.Add(SpecialMediumInfo.BodyCleaned);
+
+            if (infos.Count > 0)
+            {
+                var selectedInfo = infos[rnd.Next(infos.Count)];
+                switch (selectedInfo)
+                {
+                    case SpecialMediumInfo.SheriffSuicide:
+                        msg = ModTranslation.getString("mediumSheriffSuicide");
+                        break;
+                    case SpecialMediumInfo.WarlockSuicide:
+                        msg = ModTranslation.getString("mediumWarlockSuicide");
+                        break;
+                    case SpecialMediumInfo.ThiefSuicide:
+                        msg = ModTranslation.getString("mediumThiefSuicide");
+                        break;
+                    case SpecialMediumInfo.ActiveLoverDies:
+                        msg = ModTranslation.getString("mediumActiveLoverDies");
+                        break;
+                    case SpecialMediumInfo.PassiveLoverSuicide:
+                        msg = ModTranslation.getString("mediumPassiveLoverSuicide");
+                        break;
+                    case SpecialMediumInfo.LawyerKilledByClient:
+                        msg = ModTranslation.getString("mediumLawyerKilledByClient");
+                        break;
+                    case SpecialMediumInfo.JackalKillsSidekick:
+                        msg = ModTranslation.getString("mediumJackalKillsSidekick");
+                        break;
+                    case SpecialMediumInfo.ImpostorTeamkill:
+                        msg = ModTranslation.getString("mediumImpostorTeamkill");
+                        break;
+                    case SpecialMediumInfo.BodyCleaned:
+                        msg = ModTranslation.getString("mediumBodyCleaned");
+                        break;
+                }
+            }
+            else
+            {
+                var randomNumber = rnd.Next(4);
+                var typeOfColor = Helpers.isLighterColor(Medium.target.killerIfExisting) ? "colorLight".Translate() : "colorDark".Translate();
+                var timeSinceDeath = (float)(meetingStartTime - Medium.target.timeOfDeath).TotalMilliseconds;
+                var roleString = RoleInfo.GetRolesString(Medium.target.player, false);
+                var roleInfo = RoleInfo.getRoleInfoForPlayer(Medium.target.player);
+                if (randomNumber == 0)
+                {
+                    if (!roleInfo.Contains(RoleInfo.impostor) && !roleInfo.Contains(RoleInfo.crewmate)) msg = string.Format(ModTranslation.getString("mediumQuestion1"), RoleInfo.GetRolesString(Medium.target.player, false));
+                    else msg = string.Format(ModTranslation.getString("mediumQuestion5"), roleString);
+                }
+                else if (randomNumber == 1) msg = string.Format(ModTranslation.getString("mediumQuestion2"), typeOfColor);
+                else if (randomNumber == 2) msg = string.Format(ModTranslation.getString("mediumQuestion3"), Math.Round(timeSinceDeath / 1000));
+                else msg = string.Format(ModTranslation.getString("mediumQuestion4"), RoleInfo.GetRolesString(Medium.target.killerIfExisting, false, false, true)) + ".";
+            }
+
+            if (rnd.NextDouble() < chanceAdditionalInfo)
+            {
+                var count = 0;
+                var condition = "";
                 var alivePlayersList = PlayerControl.AllPlayerControls.ToArray().Where(pc => !pc.Data.IsDead);
-                switch (rnd.Next(3)) {
+                switch (rnd.Next(3))
+                {
                     case 0:
                         count = alivePlayersList.Where(pc => pc.Data.Role.IsImpostor || new List<RoleInfo>() { RoleInfo.jackal, RoleInfo.sidekick, RoleInfo.sheriff, RoleInfo.thief }.Contains(RoleInfo.getRoleInfoForPlayer(pc, false).FirstOrDefault())).Count();
-                        condition = "killer" + (count == 1 ? "" : "s");
+                        condition = ModTranslation.getString($"mediumKiller{(count == 1 ? "" : "Plural")}");
                         break;
                     case 1:
                         count = alivePlayersList.Where(Helpers.roleCanUseVents).Count();
-                        condition = "player" + (count == 1 ? "" : "s") + " who can use vents";
+                        condition = ModTranslation.getString($"mediumPlayerUseVents{(count == 1 ? "" : "Plural")}");
                         break;
                     case 2:
                         count = alivePlayersList.Where(pc => Helpers.isNeutral(pc) && pc != Jackal.jackal && pc != Sidekick.sidekick && pc != Thief.thief).Count();
-                        condition = "player" + (count == 1 ? "" : "s") + " who " + (count == 1 ? "is" : "are") + " neutral but cannot kill";
+                        condition = ModTranslation.getString($"mediumPlayerNeutral{(count == 1 ? "" : "Plural")}");
                         break;
                     case 3:
                         //count = alivePlayersList.Where(pc =>
-                        break;               
+                        break;
                 }
-                msg += $"\nWhen you asked, {count} " + condition + (count == 1 ? " was" : " were") + " still alive";
+                msg += $"\n" + string.Format(ModTranslation.getString("mediumAskPrefix"), string.Format(ModTranslation.getString($"mediumStillAlive{(count == 1 ? "" : "Plural")}"), string.Format(condition, count)));
             }
-
-            return Medium.target.player.Data.PlayerName + "'s Soul:\n" + msg;
+            return string.Format(ModTranslation.getString("mediumSoulPlayerPrefix"), Medium.target.player.Data.PlayerName) + msg;
         }
     }
 
-    public static class Lawyer {
+        public static class Lawyer {
         public static PlayerControl lawyer;
         public static PlayerControl target;
         public static Color color = new Color32(134, 153, 25, byte.MaxValue);

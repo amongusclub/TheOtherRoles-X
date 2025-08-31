@@ -1,20 +1,19 @@
-using HarmonyLib;
-using Hazel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static TheOtherRoles.TheOtherRoles;
-using static TheOtherRoles.GameHistory;
-using TheOtherRoles.Objects;
-
-using TheOtherRoles.Utilities;
-using UnityEngine;
-using TheOtherRoles.CustomGameModes;
-using static UnityEngine.GraphicsBuffer;
 using AmongUs.GameOptions;
 using Assets.CoreScripts;
-using Sentry.Internal.Extensions;
+using HarmonyLib;
+using Hazel;
 using Reactor.Utilities.Extensions;
+using Sentry.Internal.Extensions;
+using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.Modules;
+using TheOtherRoles.Objects;
+using TheOtherRoles.Utilities;
+using UnityEngine;
+using static TheOtherRoles.GameHistory;
+using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles.Patches {
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
@@ -540,10 +539,10 @@ namespace TheOtherRoles.Patches {
                     if (p == PlayerControl.LocalPlayer) {
                         if (p.Data.IsDead) roleNames = roleText;
                         playerInfoText = $"{roleNames}";
-                        if (p == Swapper.swapper) playerInfoText = $"{roleNames}" + Helpers.cs(Swapper.color, $" ({Swapper.charges})");
+                        if (p == Swapper.swapper) playerInfoText = $"{roleNames}" + Helpers.ColorString(Swapper.color, $" ({Swapper.charges})");
                         if (HudManager.Instance.TaskPanel != null) {
                             TMPro.TextMeshPro tabText = HudManager.Instance.TaskPanel.tab.transform.FindChild("TabText_TMP").GetComponent<TMPro.TextMeshPro>();
-                            tabText.SetText($"Tasks {taskInfo}");
+                            tabText.SetText($"{"tabTaskText".Translate()} {taskInfo}");
                         }
                         meetingInfoText = $"{roleNames} {taskInfo}".Trim();
                     }
@@ -627,15 +626,18 @@ namespace TheOtherRoles.Patches {
             int numberOfTasks = playerTotal - playerCompleted;
 
             if (Snitch.isRevealed && ((Snitch.targets == Snitch.Targets.EvilPlayers && Helpers.isEvil(local)) || (Snitch.targets == Snitch.Targets.Killers && Helpers.isKiller(local)))) {
-                if (Snitch.text == null) {
+                if (Snitch.text == null)
+                {
                     Snitch.text = GameObject.Instantiate(FastDestroyableSingleton<HudManager>.Instance.KillButton.cooldownTimerText, FastDestroyableSingleton<HudManager>.Instance.transform);
                     Snitch.text.enableWordWrapping = false;
                     Snitch.text.transform.localScale = Vector3.one * 0.75f;
                     Snitch.text.transform.localPosition += new Vector3(0f, 1.8f, -69f);
                     Snitch.text.gameObject.SetActive(true);
-                } else {
-                    Snitch.text.text = $"Snitch is alive: " + playerCompleted + "/" + playerTotal;
-                    if (snitchIsDead) Snitch.text.text = $"Snitch is dead!";
+                }
+                else
+                {
+                    Snitch.text.text = "snitchUpdateAliveText".Translate() + playerCompleted + "/" + playerTotal;
+                    if (snitchIsDead) Snitch.text.text = "snitchUpdateDeadText".Translate();
                 }
             } else if (Snitch.text != null)
                 Snitch.text.Destroy();
@@ -1136,9 +1138,9 @@ namespace TheOtherRoles.Patches {
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.LocalPlayer.CmdReportDeadBody))]
-    class BodyReportPatch
+    internal class BodyReportPatch
     {
-        static void Postfix(PlayerControl __instance, [HarmonyArgument(0)]NetworkedPlayerInfo target)
+        public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo target)
         {
             // Medic or Detective report
             bool isMedicReport = Medic.medic != null && Medic.medic == PlayerControl.LocalPlayer && __instance.PlayerId == Medic.medic.PlayerId;
@@ -1147,25 +1149,34 @@ namespace TheOtherRoles.Patches {
             {
                 DeadPlayer deadPlayer = deadPlayers?.Where(x => x.player?.PlayerId == target?.PlayerId)?.FirstOrDefault();
 
-                if (deadPlayer != null && deadPlayer.killerIfExisting != null) {
+                if (deadPlayer != null && deadPlayer.killerIfExisting != null)
+                {
                     float timeSinceDeath = ((float)(DateTime.UtcNow - deadPlayer.timeOfDeath).TotalMilliseconds);
                     string msg = "";
 
-                    if (isMedicReport) {
-                        msg = $"Body Report: Killed {Math.Round(timeSinceDeath / 1000)}s ago!";
-                    } else if (isDetectiveReport) {
-                        if (timeSinceDeath < Detective.reportNameDuration * 1000) {
-                            msg =  $"Body Report: The killer appears to be {deadPlayer.killerIfExisting.Data.PlayerName}!";
-                        } else if (timeSinceDeath < Detective.reportColorDuration * 1000) {
-                            var typeOfColor = Helpers.isLighterColor(deadPlayer.killerIfExisting) ? "lighter" : "darker";
-                            msg =  $"Body Report: The killer appears to be a {typeOfColor} color!";
-                        } else {
-                            msg = $"Body Report: The corpse is too old to gain information from!";
+                    if (isMedicReport)
+                    {
+                        msg = string.Format(ModTranslation.getString("medicReport"), Math.Round(timeSinceDeath / 1000));
+                    }
+                    else if (isDetectiveReport)
+                    {
+                        if (timeSinceDeath < Detective.reportNameDuration * 1000)
+                        {
+                            msg = string.Format(ModTranslation.getString("detectiveReportName"), deadPlayer.killerIfExisting.Data.PlayerName);
+                        }
+                        else if (timeSinceDeath < Detective.reportColorDuration * 1000)
+                        {
+                            var typeOfColor = Helpers.isLighterColor(deadPlayer.killerIfExisting) ? "colorLight".Translate() : "colorDark".Translate();
+                            msg = string.Format(ModTranslation.getString("detectiveReportColor"), typeOfColor);
+                        }
+                        else
+                        {
+                            msg = ModTranslation.getString("detectiveReportNone");
                         }
                     }
 
                     if (!string.IsNullOrWhiteSpace(msg))
-                    {   
+                    {
                         if (AmongUsClient.Instance.AmClient && FastDestroyableSingleton<HudManager>.Instance)
                         {
                             FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, msg);
@@ -1183,7 +1194,7 @@ namespace TheOtherRoles.Patches {
                         }
                     }
                 }
-            }  
+            }
         }
     }
 
@@ -1244,7 +1255,7 @@ namespace TheOtherRoles.Patches {
 
             // Seer show flash and add dead player position
             if (Seer.seer != null && (PlayerControl.LocalPlayer == Seer.seer || Helpers.shouldShowGhostInfo()) && !Seer.seer.Data.IsDead && Seer.seer != target && Seer.mode <= 1) {
-                Helpers.showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message : "Seer Info: Someone Died");
+                Helpers.showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: "seerInfoText");
             }
             if (Seer.deadBodyPositions != null) Seer.deadBodyPositions.Add(target.transform.position);
 

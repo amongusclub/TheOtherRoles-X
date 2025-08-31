@@ -1,15 +1,16 @@
   
-using HarmonyLib;
-using static TheOtherRoles.TheOtherRoles;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-
-using TheOtherRoles.Utilities;
-using TheOtherRoles.CustomGameModes;
+using HarmonyLib;
 using LibCpp2IL.Elf;
+using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.Modules;
+using TheOtherRoles.Utilities;
+using TMPro;
+using UnityEngine;
+using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles.Patches {
     enum CustomGameOverReason {
@@ -279,117 +280,154 @@ namespace TheOtherRoles.Patches {
                 foreach(var data in AdditionalTempData.playerRoles) {
                     if (data.PlayerName != CachedPlayerData2.PlayerName) continue;
                     var roles = 
-                    poolablePlayer.cosmetics.nameText.text += $"\n{string.Join("\n", data.Roles.Select(x => Helpers.cs(x.color, x.name)))}";
+                    poolablePlayer.cosmetics.nameText.text += $"\n{string.Join("\n", data.Roles.Select(x => Helpers.ColorString(x.color, x.name)))}";
                 }
             }
 
             // Additional code
-            GameObject bonusText = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);
-            bonusText.transform.position = new Vector3(__instance.WinText.transform.position.x, __instance.WinText.transform.position.y - 0.5f, __instance.WinText.transform.position.z);
+            var bonusText = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);
+            bonusText.transform.position = new Vector3(__instance.WinText.transform.position.x,
+                __instance.WinText.transform.position.y - 0.5f, __instance.WinText.transform.position.z);
             bonusText.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
-            TMPro.TMP_Text textRenderer = bonusText.GetComponent<TMPro.TMP_Text>();
-            textRenderer.text = "";
+            var textRenderer = bonusText.GetComponent<TMP_Text>();
+            string endGameText = "";
 
-            if (AdditionalTempData.winCondition == WinCondition.JesterWin) {
-                textRenderer.text = "Jester Wins";
-                textRenderer.color = Jester.color;
-            } else if (AdditionalTempData.winCondition == WinCondition.ArsonistWin) {
-                textRenderer.text = "Arsonist Wins";
-                textRenderer.color = Arsonist.color;
-            } else if (AdditionalTempData.winCondition == WinCondition.VultureWin) {
-                textRenderer.text = "Vulture Wins";
-                textRenderer.color = Vulture.color;
-            } else if (AdditionalTempData.winCondition == WinCondition.ProsecutorWin) {
-                textRenderer.text = "Prosecutor Wins";
-                textRenderer.color = Lawyer.color;
-            } else if (AdditionalTempData.winCondition == WinCondition.LoversTeamWin) {
-                textRenderer.text = "Lovers And Crewmates Win";
-                textRenderer.color = Lovers.color;
-                __instance.BackgroundBar.material.SetColor("_Color", Lovers.color);
-            } else if (AdditionalTempData.winCondition == WinCondition.LoversSoloWin) {
-                textRenderer.text = "Lovers Win";
-                textRenderer.color = Lovers.color;
-                __instance.BackgroundBar.material.SetColor("_Color", Lovers.color);
-            } else if (AdditionalTempData.winCondition == WinCondition.JackalWin) {
-                textRenderer.text = "Team Jackal Wins";
-                textRenderer.color = Jackal.color;
-            } else if (AdditionalTempData.winCondition == WinCondition.MiniLose) {
-                textRenderer.text = "Mini died";
-                textRenderer.color = Mini.color;
-            } else if (AdditionalTempData.winCondition == WinCondition.Default) {
-                switch (OnGameEndPatch.gameOverReason) {
-                    case GameOverReason.ImpostorDisconnect:
-                        textRenderer.text = "Last Crewmate Disconnected";
-                        textRenderer.color = Color.red;
-                        break;
-                    case GameOverReason.ImpostorsByKill:
-                        textRenderer.text = "Impostors Win - By Kill";
-                        textRenderer.color = Color.red;
-                        break;
-                    case GameOverReason.ImpostorsBySabotage:
-                        textRenderer.text = "Impostors Win - By Sabotage";
-                        textRenderer.color = Color.red;
-                        break;
-                    case GameOverReason.ImpostorsByVote:
-                        textRenderer.text = "Impostors Win - By Vote, Guess or DC";
-                        textRenderer.color = Color.red;
-                        break;
-                    case GameOverReason.CrewmatesByTask:
-                        textRenderer.text = "Crew Wins - Taskwin";
-                        textRenderer.color = Color.white;
-                        break;
-                    case GameOverReason.CrewmateDisconnect:
-                        textRenderer.text = "Crew Wins - No Evil Killers Left";
-                        textRenderer.color = Color.white;
-                        break;
-                    case GameOverReason.CrewmatesByVote:
-                        textRenderer.text = "Crew Wins - No Evil Killers Left";
-                        textRenderer.color = Color.white;
-                        break;
-                }
+            switch (AdditionalTempData.winCondition)
+            {
+                case WinCondition.JesterWin:
+                    endGameText = "jesterWin";
+                    textRenderer.color = Jester.color;
+                    break;
+
+                case WinCondition.ArsonistWin:
+                    endGameText = "arsonistWin";
+                    textRenderer.color = Arsonist.color;
+                    break;
+
+                case WinCondition.VultureWin:
+                    endGameText = "vultureWin";
+                    textRenderer.color = Vulture.color;
+                    break;
+
+                case WinCondition.ProsecutorWin:
+                    endGameText = "prosecutorWin";
+                    textRenderer.color = Lawyer.color;
+                    break;
+
+                case WinCondition.LoversTeamWin:
+                    endGameText = "loversTeamWin";
+                    textRenderer.color = Lovers.color;
+                    __instance.BackgroundBar.material.SetColor("_Color", Lovers.color);
+                    break;
+
+                case WinCondition.LoversSoloWin:
+                    endGameText = "loversSoloWin";
+                    textRenderer.color = Lovers.color;
+                    __instance.BackgroundBar.material.SetColor("_Color", Lovers.color);
+                    break;
+
+                case WinCondition.JackalWin:
+                    endGameText = "jackalWin";
+                    textRenderer.color = Jackal.color;
+                    break;
+
+                case WinCondition.MiniLose:
+                    endGameText = "miniLose";
+                    textRenderer.color = Mini.color;
+                    break;
+
+                case WinCondition.Default:
+                    switch (OnGameEndPatch.gameOverReason)
+                    {
+                        case GameOverReason.ImpostorDisconnect:
+                            endGameText = "impostorDisconnect";
+                            textRenderer.color = Color.red;
+                            break;
+
+                        case GameOverReason.ImpostorsByKill:
+                            endGameText = "impostorsByKill";
+                            textRenderer.color = Color.red;
+                            break;
+
+                        case GameOverReason.ImpostorsBySabotage:
+                            endGameText = "impostorsBySabotage";
+                            textRenderer.color = Color.red;
+                            break;
+
+                        case GameOverReason.ImpostorsByVote:
+                            endGameText = "impostorsByVote";
+                            textRenderer.color = Color.red;
+                            break;
+
+                        case GameOverReason.CrewmatesByTask:
+                            endGameText = "crewmatesByTask";
+                            textRenderer.color = Color.white;
+                            break;
+
+                        case GameOverReason.CrewmateDisconnect:
+                            endGameText = "crewmateDisconnect";
+                            textRenderer.color = Color.white;
+                            break;
+
+                        case GameOverReason.CrewmatesByVote:
+                            endGameText = "crewmatesByVote";
+                            textRenderer.color = Color.white;
+                            break;
+                    }
+                    break;
             }
 
-            foreach (WinCondition cond in AdditionalTempData.additionalWinConditions) {
-                if (cond == WinCondition.AdditionalLawyerBonusWin) {
-                    textRenderer.text += $"\n{Helpers.cs(Lawyer.color, "The Lawyer wins with the client")}";
-                } else if (cond == WinCondition.AdditionalAlivePursuerWin) {
-                    textRenderer.text += $"\n{Helpers.cs(Pursuer.color, "The Pursuer survived")}";
-                }
-            }
+            textRenderer.text = endGameText.Translate();
 
-            if (TORMapOptions.showRoleSummary || HideNSeek.isHideNSeekGM || PropHunt.isPropHuntGM) {
+            foreach (var cond in AdditionalTempData.additionalWinConditions)
+                if (cond == WinCondition.AdditionalLawyerBonusWin)
+                    textRenderer.text += $"\n{Helpers.ColorString(Lawyer.color, "additionalLawyerBonusWin".Translate())}";
+                else if (cond == WinCondition.AdditionalAlivePursuerWin)
+                    textRenderer.text += $"\n{Helpers.ColorString(Pursuer.color, "")}";
+
+            if (TORMapOptions.showRoleSummary || HideNSeek.isHideNSeekGM || PropHunt.isPropHuntGM)
+            {
                 var position = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, Camera.main.nearClipPlane));
-                GameObject roleSummary = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);
-                roleSummary.transform.position = new Vector3(__instance.Navigation.ExitButton.transform.position.x + 0.1f, position.y - 0.1f, -214f); 
+                var roleSummary = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);
+                roleSummary.transform.position = new Vector3(__instance.Navigation.ExitButton.transform.position.x + 0.1f,
+                    position.y - 0.1f, -214f);
                 roleSummary.transform.localScale = new Vector3(1f, 1f, 1f);
 
                 var roleSummaryText = new StringBuilder();
-                if (HideNSeek.isHideNSeekGM || PropHunt.isPropHuntGM) {
-                    int minutes = (int)AdditionalTempData.timer / 60;
-                    int seconds = (int)AdditionalTempData.timer % 60;
-                    roleSummaryText.AppendLine($"<color=#FAD934FF>Time: {minutes:00}:{seconds:00}</color> \n");
+                if (HideNSeek.isHideNSeekGM || PropHunt.isPropHuntGM)
+                {
+                    var minutes = (int)AdditionalTempData.timer / 60;
+                    var seconds = (int)AdditionalTempData.timer % 60;
+                    roleSummaryText.AppendLine($"<color=#FAD934FF>{"gameTimeText".Translate()} {minutes:00}:{seconds:00}</color> \n");
                 }
-                roleSummaryText.AppendLine("Players and roles at the end of the game:");
-                foreach(var data in AdditionalTempData.playerRoles) {
-                    //var roles = string.Join(" ", data.Roles.Select(x => Helpers.cs(x.color, x.name)));
-                    string roles = data.RoleNames;
+
+                roleSummaryText.AppendLine("endGameMainText".Translate());
+                foreach (var data in AdditionalTempData.playerRoles)
+                {
+                    //var roles = string.Join(" ", data.Roles.Select(x => Helpers.ColorString(x.color, x.name)));
+                    var roles = data.RoleNames;
                     //if (data.IsGuesser) roles += " (Guesser)";
-                    var taskInfo = data.TasksTotal > 0 ? $" - <color=#FAD934FF>({data.TasksCompleted}/{data.TasksTotal})</color>" : "";
-                    if (data.Kills != null) taskInfo += $" - <color=#FF0000FF>(Kills: {data.Kills})</color>";
-                    roleSummaryText.AppendLine($"{Helpers.cs(data.IsAlive ? Color.white : new Color(.7f,.7f,.7f), data.PlayerName)} - {roles}{taskInfo}"); 
+                    var taskInfo = data.TasksTotal > 0
+                        ? $" - <color=#FAD934FF>({data.TasksCompleted}/{data.TasksTotal})</color>"
+                        : "";
+                    if (data.Kills != null) taskInfo += $" - <color=#FF0000FF>({"endGameKills".Translate()} {data.Kills})</color>";
+                    roleSummaryText.AppendLine(
+                        $"{Helpers.ColorString(data.IsAlive ? Color.white : new Color(.7f, .7f, .7f), data.PlayerName)} - {roles}{taskInfo}");
                 }
-                TMPro.TMP_Text roleSummaryTextMesh = roleSummary.GetComponent<TMPro.TMP_Text>();
-                roleSummaryTextMesh.alignment = TMPro.TextAlignmentOptions.TopLeft;
+
+                var roleSummaryTextMesh = roleSummary.GetComponent<TMP_Text>();
+                roleSummaryTextMesh.alignment = TextAlignmentOptions.TopLeft;
                 roleSummaryTextMesh.color = Color.white;
                 roleSummaryTextMesh.fontSizeMin = 1.5f;
                 roleSummaryTextMesh.fontSizeMax = 1.5f;
                 roleSummaryTextMesh.fontSize = 1.5f;
-                
+
                 var roleSummaryTextMeshRectTransform = roleSummaryTextMesh.GetComponent<RectTransform>();
                 roleSummaryTextMeshRectTransform.anchoredPosition = new Vector2(position.x + 3.5f, position.y - 0.1f);
                 roleSummaryTextMesh.text = roleSummaryText.ToString();
-                Helpers.previousEndGameSummary = $"<size=110%>{roleSummaryText.ToString()}</size>";
+                Helpers.previousEndGameSummary = $"<size=110%>{roleSummaryText}</size>";
             }
+
             AdditionalTempData.clear();
         }
     }
@@ -417,7 +455,6 @@ namespace TheOtherRoles.Patches {
 
         private static bool CheckAndEndGameForMiniLose(ShipStatus __instance) {
             if (Mini.triggerMiniLose) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.MiniLose, false);
                 return true;
             }
@@ -426,7 +463,6 @@ namespace TheOtherRoles.Patches {
 
         private static bool CheckAndEndGameForJesterWin(ShipStatus __instance) {
             if (Jester.triggerJesterWin) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.JesterWin, false);
                 return true;
             }
@@ -435,7 +471,6 @@ namespace TheOtherRoles.Patches {
 
         private static bool CheckAndEndGameForArsonistWin(ShipStatus __instance) {
             if (Arsonist.triggerArsonistWin) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.ArsonistWin, false);
                 return true;
             }
@@ -444,7 +479,6 @@ namespace TheOtherRoles.Patches {
 
         private static bool CheckAndEndGameForVultureWin(ShipStatus __instance) {
             if (Vulture.triggerVultureWin) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.VultureWin, false);
                 return true;
             }
@@ -480,7 +514,6 @@ namespace TheOtherRoles.Patches {
         private static bool CheckAndEndGameForTaskWin(ShipStatus __instance) {
             if (HideNSeek.isHideNSeekGM && !HideNSeek.taskWinPossible || PropHunt.isPropHuntGM) return false;
             if (GameData.Instance.TotalTasks > 0 && GameData.Instance.TotalTasks <= GameData.Instance.CompletedTasks) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame(GameOverReason.CrewmatesByTask, false);
                 return true;
             }
@@ -489,7 +522,6 @@ namespace TheOtherRoles.Patches {
 
         private static bool CheckAndEndGameForProsecutorWin(ShipStatus __instance) {
             if (Lawyer.triggerProsecutorWin) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.ProsecutorWin, false);
                 return true;
             }
@@ -498,7 +530,6 @@ namespace TheOtherRoles.Patches {
 
         private static bool CheckAndEndGameForLoverWin(ShipStatus __instance, PlayerStatistics statistics) {
             if (statistics.TeamLoversAlive == 2 && statistics.TotalAlive <= 3) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.LoversWin, false);
                 return true;
             }
@@ -507,7 +538,6 @@ namespace TheOtherRoles.Patches {
 
         private static bool CheckAndEndGameForJackalWin(ShipStatus __instance, PlayerStatistics statistics) {
             if (statistics.TeamJackalAlive >= statistics.TotalAlive - statistics.TeamJackalAlive && statistics.TeamImpostorsAlive == 0 && !(statistics.TeamJackalHasAliveLover && statistics.TeamLoversAlive == 2)) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.TeamJackalWin, false);
                 return true;
             }
@@ -519,7 +549,6 @@ namespace TheOtherRoles.Patches {
                 if ((0 != statistics.TotalAlive - statistics.TeamImpostorsAlive)) return false;
 
             if (statistics.TeamImpostorsAlive >= statistics.TotalAlive - statistics.TeamImpostorsAlive && statistics.TeamJackalAlive == 0 && !(statistics.TeamImpostorHasAliveLover && statistics.TeamLoversAlive == 2)) {
-                //__instance.enabled = false;
                 GameOverReason endReason;
                 switch (GameData.LastDeathReason) {
                     case DeathReason.Exile:
@@ -540,7 +569,6 @@ namespace TheOtherRoles.Patches {
 
         private static bool CheckAndEndGameForCrewmateWin(ShipStatus __instance, PlayerStatistics statistics) {
             if (HideNSeek.isHideNSeekGM && HideNSeek.timer <= 0 && !HideNSeek.isWaitingTimer) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame(GameOverReason.CrewmatesByVote, false);
                 return true;
             }
@@ -549,7 +577,6 @@ namespace TheOtherRoles.Patches {
                 return true;
             }
             if (statistics.TeamImpostorsAlive == 0 && statistics.TeamJackalAlive == 0) {
-                //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame(GameOverReason.CrewmatesByVote, false);
                 return true;
             }
@@ -557,7 +584,6 @@ namespace TheOtherRoles.Patches {
         }
 
         private static void EndGameForSabotage(ShipStatus __instance) {
-            //__instance.enabled = false;
             GameManager.Instance.RpcEndGame(GameOverReason.ImpostorsBySabotage, false);
             return;
         }

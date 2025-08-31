@@ -242,7 +242,7 @@ namespace TheOtherRoles
             SoundManager.Instance.StopSound(GameStartManager.Instance.gameStartSound);
             if (AmongUsClient.Instance.AmHost) {
                 GameStartManager.Instance.ResetStartState();
-                PlayerControl.LocalPlayer.RpcSendChat($"{Helpers.playerById(playerId).Data.PlayerName} stopped the game start!");
+                PlayerControl.LocalPlayer.RpcSendChat(string.Format("stopStartChatText".Translate(), Helpers.playerById(playerId).Data.PlayerName));
             }
         }
 
@@ -520,7 +520,7 @@ namespace TheOtherRoles
         public static void engineerUsedRepair() {
             Engineer.remainingFixes--;
             if (Helpers.shouldShowGhostInfo()) {
-                Helpers.showFlash(Engineer.color, 0.5f, "Engineer Fix"); ;
+                Helpers.showFlash(Engineer.color, 0.5f, "engineerUsedRepairText"); ;
             }
         }
 
@@ -890,7 +890,7 @@ namespace TheOtherRoles
             Trickster.lightsOutTimer = Trickster.lightsOutDuration;
             // If the local player is impostor indicate lights out
             if(Helpers.hasImpVision(GameData.Instance.GetPlayerById(PlayerControl.LocalPlayer.PlayerId))) {
-                new CustomMessage("Lights are out", Trickster.lightsOutDuration);
+                new CustomMessage("lightsOutText".Translate(), Trickster.lightsOutDuration);
             }
         }
 
@@ -1064,8 +1064,8 @@ namespace TheOtherRoles
             PlayerControl guessedTarget = Helpers.playerById(guessedTargetId);
             if (PlayerControl.LocalPlayer.Data.IsDead && guessedTarget != null && guesser != null) {
                 RoleInfo roleInfo = RoleInfo.allRoleInfos.FirstOrDefault(x => (byte)x.roleId == guessedRoleId);
-                string msg = $"{guesser.Data.PlayerName} guessed the role {roleInfo?.name ?? ""} for {guessedTarget.Data.PlayerName}!";
-                if (AmongUsClient.Instance.AmClient && FastDestroyableSingleton<HudManager>.Instance)
+                var msg =
+                    string.Format("guessedChatText".Translate(), guesser.Data.PlayerName, roleInfo?.name ?? "", guessedTarget.Data.PlayerName); if (AmongUsClient.Instance.AmClient && FastDestroyableSingleton<HudManager>.Instance)
                     FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(guesser, msg);
                 if (msg.IndexOf("who", StringComparison.OrdinalIgnoreCase) >= 0)
                     FastDestroyableSingleton<UnityTelemetry>.Instance.SendWho();
@@ -1662,7 +1662,7 @@ namespace TheOtherRoles
                     RoleDraft.receivePickOrder(reader.ReadByte(), reader);
                     break;
                 case (byte)CustomRPC.DraftModePick:
-                    RoleDraft.receivePick(reader.ReadByte(), reader.ReadByte());
+                    RoleDraft.receivePick(reader.ReadByte(), reader.ReadByte(), reader.ReadBoolean());
                     break;
                 case (byte)CustomRPC.ShareGhostInfo:
                     RPCProcedure.receiveGhostInfo(reader.ReadByte(), reader);

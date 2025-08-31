@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Epic.OnlineServices.Presence;
 using HarmonyLib;
-using TheOtherRoles.Utilities;
 using TMPro;
 using UnityEngine;
 using static UnityEngine.UI.Button;
@@ -36,13 +30,13 @@ namespace TheOtherRoles.CustomGameModes {
                 pButton.buttonText.text = GameModeText.GetComponent<TextMeshPro>().text;
                 pButton.OnClick.RemoveAllListeners();
                 pButton.OnClick = new ButtonClickedEvent();
-                __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => { pButton.buttonText.text = Helpers.cs(Color.yellow, GameModeText.GetComponent<TextMeshPro>().text); })));
+                __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => { pButton.buttonText.text = Helpers.ColorString(Color.yellow, GameModeText.GetComponent<TextMeshPro>().text); })));
                 gameModeButton.transform.GetChild(1).GetComponent<SpriteRenderer>().color = new Color(0.1f, 0.1f, 0.1f);
                 gameModeButton.transform.GetChild(2).GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f);
                 pButton.OnClick.AddListener((Action)(() =>
                 {
                     TORMapOptions.gameMode = (CustomGamemodes)((int)(TORMapOptions.gameMode + 1)  % Enum.GetNames(typeof(CustomGamemodes)).Length);
-                    __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => { pButton.buttonText.text = Helpers.cs(Color.yellow, GameModeText.GetComponent<TextMeshPro>().text); })));
+                    __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => { pButton.buttonText.text = Helpers.ColorString(Color.yellow, GameModeText.GetComponent<TextMeshPro>().text); })));
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareGamemode, Hazel.SendOption.Reliable, -1);
                     writer.Write((byte)TORMapOptions.gameMode);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);

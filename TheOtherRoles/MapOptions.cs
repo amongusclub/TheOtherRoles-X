@@ -18,8 +18,8 @@ namespace TheOtherRoles{
         public static bool enableSoundEffects = true;
         public static bool enableHorseMode = false;
         public static bool shieldFirstKill = false;
-        public static bool ShowVentsOnMap = true;
-        public static bool ShowChatNotifications = true;
+        public static bool showVentsOnMap = true;
+        public static bool showChatNotifications = true;
         public static CustomGamemodes gameMode = CustomGamemodes.Classic;
 
         // Updating values
@@ -54,8 +54,8 @@ namespace TheOtherRoles{
             showLighterDarker = TheOtherRolesPlugin.ShowLighterDarker.Value;
             enableSoundEffects = TheOtherRolesPlugin.EnableSoundEffects.Value;
             enableHorseMode = TheOtherRolesPlugin.EnableHorseMode.Value;
-            ShowVentsOnMap = TheOtherRolesPlugin.ShowVentsOnMap.Value;
-            ShowChatNotifications = TheOtherRolesPlugin.ShowChatNotifications.Value;
+            showVentsOnMap = TheOtherRolesPlugin.ShowVentsOnMap.Value;
+            showChatNotifications = TheOtherRolesPlugin.ShowChatNotifications.Value;
 
             //Patches.ShouldAlwaysHorseAround.isHorseMode = TheOtherRolesPlugin.EnableHorseMode.Value;
         }

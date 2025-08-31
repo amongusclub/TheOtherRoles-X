@@ -1,16 +1,16 @@
-using HarmonyLib;
-using Hazel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
+using Hazel;
+using Innersloth.Assets;
+using TheOtherRoles.Modules;
+using TheOtherRoles.Objects;
+using TheOtherRoles.Utilities;
+using TMPro;
+using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
 using static TheOtherRoles.TORMapOptions;
-using TheOtherRoles.Objects;
-using System;
-
-using TheOtherRoles.Utilities;
-using UnityEngine;
-using Innersloth.Assets;
-using TMPro;
 
 namespace TheOtherRoles.Patches {
     [HarmonyPatch]
@@ -250,30 +250,40 @@ namespace TheOtherRoles.Patches {
         }
 
 
-        static void swapperOnClick(int i, MeetingHud __instance) {
+        private static void swapperOnClick(int i, MeetingHud __instance)
+        {
             if (__instance.state == MeetingHud.VoteStates.Results || Swapper.charges <= 0) return;
             if (__instance.playerStates[i].AmDead) return;
 
-            int selectedCount = selections.Where(b => b).Count();
-            SpriteRenderer renderer = renderers[i];
+            var selectedCount = selections.Where(b => b).Count();
+            var renderer = renderers[i];
 
-            if (selectedCount == 0) {
+            if (selectedCount == 0)
+            {
                 renderer.color = Color.yellow;
                 selections[i] = true;
-            } else if (selectedCount == 1) {
-                if (selections[i]) {
+            }
+            else if (selectedCount == 1)
+            {
+                if (selections[i])
+                {
                     renderer.color = Color.red;
                     selections[i] = false;
-                } else {
+                }
+                else
+                {
                     selections[i] = true;
                     renderer.color = Color.yellow;
-                    meetingExtraButtonLabel.text = Helpers.cs(Color.yellow, "Confirm Swap");
+                    meetingExtraButtonLabel.text = Helpers.ColorString(Color.yellow, "meetingSwapperButtonLabel".Translate());
                 }
-            } else if (selectedCount == 2) {
-                if (selections[i]) {
+            }
+            else if (selectedCount == 2)
+            {
+                if (selections[i])
+                {
                     renderer.color = Color.red;
                     selections[i] = false;
-                    meetingExtraButtonLabel.text = Helpers.cs(Color.red, "Confirm Swap");
+                    meetingExtraButtonLabel.text = Helpers.ColorString(Color.red, "meetingSwapperButtonLabel".Translate());
                 }
             }
         }
@@ -299,16 +309,17 @@ namespace TheOtherRoles.Patches {
                     }
                 if (swapperButtonList[A] != null) swapperButtonList[A].OnClick.RemoveAllListeners();  // Swap buttons can't be clicked / changed anymore
             }
-            if (firstPlayer != null && secondPlayer != null) {
+            if (firstPlayer != null && secondPlayer != null)
+            {
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SwapperSwap, Hazel.SendOption.Reliable, -1);
                 writer.Write((byte)firstPlayer.TargetPlayerId);
                 writer.Write((byte)secondPlayer.TargetPlayerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
 
                 RPCProcedure.swapperSwap((byte)firstPlayer.TargetPlayerId, (byte)secondPlayer.TargetPlayerId);
-                meetingExtraButtonLabel.text = Helpers.cs(Color.green, "Swapping!");
+                meetingExtraButtonLabel.text = Helpers.ColorString(Color.green, "meetingSwappingText".Translate());
                 Swapper.charges--;
-                meetingExtraButtonText.text = $"Swaps: {Swapper.charges}";
+                meetingExtraButtonText.text = $"{"meetingSwapsText".Translate()} {Swapper.charges}";
             }
         }
 
@@ -347,8 +358,8 @@ namespace TheOtherRoles.Patches {
                 swapperButtonList[i].OnClick.RemoveAllListeners();
                 swapperButtonList[i].OnClick.AddListener((System.Action)(() => swapperOnClick(copyI, __instance)));
             }
-            meetingExtraButtonText.text = $"Swaps: {Swapper.charges}";
-            meetingExtraButtonLabel.text = Helpers.cs(Color.red, "Confirm Swap");
+            meetingExtraButtonText.text = $"{"meetingSwapsText".Translate()} {Swapper.charges}";
+            meetingExtraButtonLabel.text = Helpers.ColorString(Color.red, "meetingSwapperButtonLabel");
 
         }
 
@@ -369,7 +380,8 @@ namespace TheOtherRoles.Patches {
             writer.Write(Mayor.voteTwice);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
 
-            meetingExtraButtonLabel.text = Helpers.cs(Mayor.color, "Double Vote: " + (Mayor.voteTwice ? Helpers.cs(Color.green, "On ") : Helpers.cs(Color.red, "Off")));
+            meetingExtraButtonLabel.text = Helpers.ColorString(Mayor.color,
+                "mayorToggleVoteTwice".Translate() + (Mayor.voteTwice ? Helpers.ColorString(Color.green, "optionOn".Translate()) : Helpers.ColorString(Color.red, "optionOff".Translate())));
         }
 
         public static GameObject guesserUI;
@@ -445,7 +457,7 @@ namespace TheOtherRoles.Patches {
                 int row = i/5, col = i%5;
                 buttonParent.localPosition = new Vector3(-3.47f + 1.75f * col, 1.5f - 0.45f * row, -5);
                 buttonParent.localScale = new Vector3(0.55f, 0.55f, 1f);
-                label.text = Helpers.cs(roleInfo.color, roleInfo.name);
+                label.text = Helpers.ColorString(roleInfo.color, roleInfo.name);
                 label.alignment = TMPro.TextAlignmentOptions.Center;
                 label.transform.localPosition = new Vector3(0, 0, label.transform.localPosition.z);
                 label.transform.localScale *= 1.7f;
@@ -557,7 +569,7 @@ namespace TheOtherRoles.Patches {
                 Transform infoTransform = __instance.playerStates[0].NameText.transform.parent.FindChild("Info");
                 TMPro.TextMeshPro meetingInfo = infoTransform != null ? infoTransform.GetComponent<TMPro.TextMeshPro>() : null;
                 meetingExtraButtonText = UnityEngine.Object.Instantiate(__instance.playerStates[0].NameText, meetingExtraButtonParent);
-                meetingExtraButtonText.text = addSwapperButtons ? $"Swaps: {Swapper.charges}" : "";
+                meetingExtraButtonText.text = addSwapperButtons ? $"{"meetingSwapsText".Translate()} {Swapper.charges}" : "";
                 meetingExtraButtonText.enableWordWrapping = false;
                 meetingExtraButtonText.transform.localScale = Vector3.one * 1.7f;
                 meetingExtraButtonText.transform.localPosition = new Vector3(-2.5f, 0f, 0f);
@@ -570,12 +582,20 @@ namespace TheOtherRoles.Patches {
                 meetingExtraButtonParent.localScale = new Vector3(0.55f, 0.55f, 1f);
                 meetingExtraButtonLabel.alignment = TMPro.TextAlignmentOptions.Center;
                 meetingExtraButtonLabel.transform.localPosition = new Vector3(0, 0, meetingExtraButtonLabel.transform.localPosition.z);
-                if (addSwapperButtons) {
+                if (addSwapperButtons)
+                {
                     meetingExtraButtonLabel.transform.localScale *= 1.7f;
-                    meetingExtraButtonLabel.text = Helpers.cs(Color.red, "Confirm Swap");
-                } else if (addMayorButton) {
-                    meetingExtraButtonLabel.transform.localScale = new Vector3(meetingExtraButtonLabel.transform.localScale.x * 1.5f, meetingExtraButtonLabel.transform.localScale.x * 1.7f, meetingExtraButtonLabel.transform.localScale.x * 1.7f);
-                    meetingExtraButtonLabel.text = Helpers.cs(Mayor.color, "Double Vote: " + (Mayor.voteTwice ? Helpers.cs(Color.green, "On ") : Helpers.cs(Color.red, "Off")));
+                    meetingExtraButtonLabel.text = Helpers.ColorString(Color.red, "meetingSwapperButtonLabel");
+                }
+                else if (addMayorButton)
+                {
+                    meetingExtraButtonLabel.transform.localScale = new Vector3(
+                        meetingExtraButtonLabel.transform.localScale.x * 1.5f,
+                        meetingExtraButtonLabel.transform.localScale.x * 1.7f,
+                        meetingExtraButtonLabel.transform.localScale.x * 1.7f);
+                    meetingExtraButtonLabel.text = Helpers.ColorString(Mayor.color,
+                        "mayorToggleVoteTwice".Translate() +
+                        (Mayor.voteTwice ? Helpers.ColorString(Color.green, "optionOn".Translate()) : Helpers.ColorString(Color.red, "optionOff".Translate())));
                 }
                 PassiveButton passiveButton = meetingExtraButton.GetComponent<PassiveButton>();
                 passiveButton.OnClick.RemoveAllListeners();
@@ -693,35 +713,51 @@ namespace TheOtherRoles.Patches {
 
 
                 // Add Portal info into Portalmaker Chat:
-                if (Portalmaker.portalmaker != null && (PlayerControl.LocalPlayer == Portalmaker.portalmaker || Helpers.shouldShowGhostInfo()) && !Portalmaker.portalmaker.Data.IsDead) {
-                    if (Portal.teleportedPlayers.Count > 0) {
-                        string msg = "Portal Log:\n";
-                        foreach (var entry in Portal.teleportedPlayers) {
-                            float timeBeforeMeeting = ((float)(DateTime.UtcNow - entry.time).TotalMilliseconds) / 1000;
-                            msg += Portalmaker.logShowsTime ? $"{(int)timeBeforeMeeting}s ago: " : "";
-                            msg = msg + $"{entry.name} used the teleporter\n";
+                if (PlayerControl.LocalPlayer == Portalmaker.portalmaker || Helpers.shouldShowGhostInfo() &&
+                    !PlayerControl.LocalPlayer.Data.IsDead)
+                    if (Portal.teleportedPlayers.Count > 0)
+                    {
+                        var msg = "portalLogText".Translate();
+                        foreach (var entry in Portal.teleportedPlayers)
+                        {
+                            var timeBeforeMeeting = (float)(DateTime.UtcNow - entry.time).TotalMilliseconds / 1000;
+                            msg += Portalmaker.logShowsTime ? string.Format("portalLogTime".Translate(), (int)timeBeforeMeeting) : "";
+                            msg = msg + string.Format("portalLogTextName".Translate(), entry.name);
                         }
-                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(Portalmaker.portalmaker, $"{msg}");
+
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, $"{msg}");
                     }
-                }
 
                 // Add trapped Info into Trapper chat
-                if (Trapper.trapper != null && (PlayerControl.LocalPlayer == Trapper.trapper || Helpers.shouldShowGhostInfo()) && !Trapper.trapper.Data.IsDead) {
+                if (Trapper.trapper != null &&
+                    (PlayerControl.LocalPlayer == Trapper.trapper || Helpers.shouldShowGhostInfo()) &&
+                    !Trapper.trapper.Data.IsDead)
+                {
                     if (Trap.traps.Any(x => x.revealed))
-                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(Trapper.trapper, "Trap Logs:");
-                    foreach (Trap trap in Trap.traps) {
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(Trapper.trapper, "trapLogsText".Translate());
+                    foreach (var trap in Trap.traps)
+                    {
                         if (!trap.revealed) continue;
-                        string message = $"Trap {trap.instanceId}: \n";
+                        var message = string.Format("trapIdText".Translate(), trap.instanceId);
                         trap.trappedPlayer = trap.trappedPlayer.OrderBy(x => rnd.Next()).ToList();
-                        foreach (byte playerId in trap.trappedPlayer) {
-                            PlayerControl p = Helpers.playerById(playerId);
-                            if (Trapper.infoType == 0) message += RoleInfo.GetRolesString(p, false, false, true) + "\n";
-                            else if (Trapper.infoType == 1) {
-                                if (Helpers.isNeutral(p) || p.Data.Role.IsImpostor) message += "Evil Role \n";
-                                else message += "Good Role \n";
+                        foreach (var playerId in trap.trappedPlayer)
+                        {
+                            var p = Helpers.playerById(playerId);
+                            if (Trapper.infoType == 0)
+                            {
+                                message += RoleInfo.GetRolesString(p, false, false, true) + "\n";
                             }
-                            else message += p.Data.PlayerName + "\n";
+                            else if (Trapper.infoType == 1)
+                            {
+                                if (Helpers.isNeutral(p) || p.Data.Role.IsImpostor) message += $"{"evilRole".Translate()} \n";
+                                else message += $"{"goodRole".Translate()} \n";
+                            }
+                            else
+                            {
+                                message += p.Data.PlayerName + "\n";
+                            }
                         }
+
                         FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(Trapper.trapper, $"{message}");
                     }
                 }
@@ -729,28 +765,38 @@ namespace TheOtherRoles.Patches {
                 // Add Snitch info
                 string output = "";
 
-                if (Snitch.snitch != null && Snitch.mode != Snitch.Mode.Map && (PlayerControl.LocalPlayer == Snitch.snitch || Helpers.shouldShowGhostInfo()) && !Snitch.snitch.Data.IsDead) {
+                if (Snitch.snitch != null && Snitch.mode != Snitch.Mode.Map &&
+                    (PlayerControl.LocalPlayer == Snitch.snitch || Helpers.shouldShowGhostInfo()) &&
+                    !Snitch.snitch.Data.IsDead)
+                {
                     var (playerCompleted, playerTotal) = TasksHandler.taskInfo(Snitch.snitch.Data);
-                    int numberOfTasks = playerTotal - playerCompleted;
-                    if (numberOfTasks == 0) {
-                        output = $"Bad alive roles in game: \n \n";
-                        FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(0.4f, new Action<float>((x) => {
-                            if (x == 1f) {
-                                foreach (PlayerControl p in PlayerControl.AllPlayerControls) {
-                                    if (Snitch.targets == Snitch.Targets.Killers && !Helpers.isKiller(p)) continue;
-                                    if (Snitch.targets == Snitch.Targets.EvilPlayers && !Helpers.isEvil(p)) continue;
-                                    if (!Snitch.playerRoomMap.ContainsKey(p.PlayerId)) continue;
-                                    if (p.Data.IsDead) continue;
-                                    var room = Snitch.playerRoomMap[p.PlayerId];
-                                    var roomName = "open fields";
-                                    if (room != byte.MinValue) {
-                                        roomName = DestroyableSingleton<TranslationController>.Instance.GetString((SystemTypes)room);
+                    var numberOfTasks = playerTotal - playerCompleted;
+                    if (numberOfTasks == 0)
+                    {
+                        output = "snitchInfoBadAliveRoles".Translate();
+                        FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(0.4f,
+                            new Action<float>(x =>
+                            {
+                                if (x == 1f)
+                                {
+                                    foreach (var p in PlayerControl.AllPlayerControls)
+                                    {
+                                        if (Snitch.targets == Snitch.Targets.Killers && !Helpers.isKiller(p)) continue;
+                                        if (Snitch.targets == Snitch.Targets.EvilPlayers && !Helpers.isEvil(p)) continue;
+                                        if (!Snitch.playerRoomMap.ContainsKey(p.PlayerId)) continue;
+                                        if (p.Data.IsDead) continue;
+                                        var room = Snitch.playerRoomMap[p.PlayerId];
+                                        var roomName = "snitchInfoRoomName".Translate();
+                                        if (room != byte.MinValue)
+                                            roomName =
+                                                DestroyableSingleton<TranslationController>.Instance.GetString(
+                                                    (SystemTypes)room);
+                                        output += string.Format("snitchInfoOutput".Translate(), RoleInfo.GetRolesString(p, false, false, true), roomName);
                                     }
-                                    output += "- " + RoleInfo.GetRolesString(p, false, false, true) + ", was last seen " + roomName + "\n";
+
+                                    FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(Snitch.snitch, $"{output}");
                                 }
-                                FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(Snitch.snitch, $"{output}");
-                            }
-                        })));
+                            })));
                     }
                 }
 
@@ -823,7 +869,7 @@ namespace TheOtherRoles.Patches {
                 {
                     PlayerMaterial.SetColors(host.DefaultOutfit.ColorId, __instance.HostIcon);
                     if (Text == null) Text = __instance.ProceedButton.gameObject.GetComponentInChildren<TextMeshPro>();
-                    Text.text = $"host: {host.PlayerName}";
+                    Text.text = $"{"meetingHostNameText".Translate()} {host.PlayerName}";
                 }
             }
         }

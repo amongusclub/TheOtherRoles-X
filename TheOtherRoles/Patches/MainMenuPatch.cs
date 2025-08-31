@@ -61,10 +61,11 @@ namespace TheOtherRoles.Modules {
             PassiveButton passiveButtonDiscord = buttonDiscord.GetComponent<PassiveButton>();
             
             passiveButtonDiscord.OnClick = new Button.ButtonClickedEvent();
-            passiveButtonDiscord.OnClick.AddListener((System.Action)(() => Application.OpenURL("https://discord.gg/77RkMJHWsM")));
+            passiveButtonDiscord.OnClick.AddListener((System.Action)(() => {
+                    Application.OpenURL("https://discord.gg/SHvZMuKk");
+            }));
 
 
-            
             // TOR credits button
             if (template == null) return;
             var creditsButton = Object.Instantiate(template, template.transform.parent);
@@ -104,7 +105,7 @@ EnoPM    twix    NesTT
 Alex2911    amsyarasyiq    MaximeGillot
 Psynomit    probablyadnf    JustASysAdmin
 
-<b>[https://discord.gg/77RkMJHWsM]Discord[] Moderators:</b>
+<b>[https://discord.gg/SHvZMuKk]Discord[] Moderators:</b>
 Draco Cordraconis    Streamblox (formerly)
 Thanks to all our discord helpers!
 
@@ -132,6 +133,7 @@ Goose-Goose-Duck - Idea for the Vulture role came from Slushiegoose
 TheEpicRoles - Idea for the first kill shield (partly) and the (old) tabbed option menu (fully + some code), by LaicosVK DasMonschta Nova
 ugackMiner53 - Idea and core code for the Prop Hunt game mode
 Role Draft Music: [https://www.youtube.com/watch?v=9STiQ8cCIo0]Unreal Superhero 3 by Kenët & Rez[]
+farewell - Art work
 
 License: TheOtherRoles is licensed under the [https://github.com/TheOtherRolesAU/TheOtherRoles?tab=GPL-3.0-1-ov-file#readme]GPLv3[]
 </size>";
@@ -208,9 +210,9 @@ License: TheOtherRoles is licensed under the [https://github.com/TheOtherRolesAU
                 }));
 
                 template.StartCoroutine(Effects.Lerp(0.1f, new System.Action<float>((p) => {
-                    guesserButtonText.SetText("TOR Guesser");
-                    HideNSeekButtonText.SetText("TOR Hide N Seek");
-                    PropHuntButtonText.SetText("TOR Prop Hunt");
+                    guesserButtonText.SetText("guesserButtonText".Translate());
+                    HideNSeekButtonText.SetText("hideNSeekButtonText".Translate());
+                    PropHuntButtonText.SetText("propHuntButtonText".Translate());
                 })));
             }));
         }

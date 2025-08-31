@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Reactor.Utilities.Extensions;
 using System;
+using TheOtherRoles.Modules;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -58,11 +59,11 @@ internal class CreateGameOptionsPatch
 
             modeButtonGS = Object.Instantiate(__instance.modeButtons[0], __instance.modeButtons[0].transform);
             modeButtonGS.name = "TORGUESSER";
-            changeButtonText(modeButtonGS, "TOR Guesser");
+            changeButtonText(modeButtonGS, "guesserButtonText".Translate());
             modeButtonGS.transform.SetLocalX(5.86f);
             modeButtonGS.OnClick.RemoveAllListeners();
             __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => modeButtonGS.SelectButton(false))));
-            modeButtonGS.OnMouseOver.AddListener((Action)(() => __instance.tooltip.SetText("An extension to the Classic-Gamemode and gives you a multitude of new options for Guessers.")));
+            modeButtonGS.OnMouseOver.AddListener((Action)(() => __instance.tooltip.SetText("guesserButtonTooltip".Translate())));
             modeButtonGS.OnClick.AddListener((Action)(() =>
             {
                 TORMapOptions.gameMode = CustomGamemodes.Guesser;
@@ -76,12 +77,12 @@ internal class CreateGameOptionsPatch
 
             modeButtonHK = Object.Instantiate(modeButtonGS, __instance.modeButtons[0].transform);
             modeButtonHK.name = "TORHIDENSEEK";
-            changeButtonText(modeButtonHK, "TOR Hide N Seek");
+            changeButtonText(modeButtonHK, "hideNSeekButtonText".Translate());
             modeButtonHK.transform.SetLocalX(0);
             modeButtonHK.transform.SetLocalY(-0.9f);
             modeButtonHK.OnClick.RemoveAllListeners();
             __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => modeButtonHK.SelectButton(false))));
-            modeButtonHK.OnMouseOver.AddListener((Action)(() => __instance.tooltip.SetText("A standalone Gamemode where Hunter have to catch their prey (\"Hunted\" players).")));
+            modeButtonHK.OnMouseOver.AddListener((Action)(() => __instance.tooltip.SetText("hideNSeekButtonTooltip".Translate())));
             modeButtonHK.OnClick.AddListener((Action)(() =>
             {
                 TORMapOptions.gameMode = CustomGamemodes.HideNSeek;
@@ -95,11 +96,11 @@ internal class CreateGameOptionsPatch
 
             modeButtonPH = Object.Instantiate(modeButtonHK, __instance.modeButtons[0].transform);
             modeButtonPH.name = "TORPROPHUNT";
-            changeButtonText(modeButtonPH, "TOR Prop Hunt");
+            changeButtonText(modeButtonPH, "propHuntButtonText".Translate());
             modeButtonPH.transform.SetLocalX(2.91f);
             modeButtonPH.OnClick.RemoveAllListeners();
             __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => modeButtonPH.SelectButton(false))));
-            modeButtonPH.OnMouseOver.AddListener((Action)(() => __instance.tooltip.SetText("A standalone Gamemode where Hunters have to find the disguised players (\"Props\").")));
+            modeButtonPH.OnMouseOver.AddListener((Action)(() => __instance.tooltip.SetText("propHuntButtonTooltip".Translate())));
             modeButtonPH.OnClick.AddListener((Action)(() =>
             {
                 TORMapOptions.gameMode = CustomGamemodes.PropHunt;
@@ -134,11 +135,11 @@ internal class CreateGameOptionsPatch
                 case CustomGamemodes.Classic:
                     return DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.GameTypeClassic);
                 case CustomGamemodes.Guesser:
-                    return "TOR Guesser";
+                    return "guesserButtonText".Translate();
                 case CustomGamemodes.HideNSeek:
-                    return "TOR Hide N Seek";
+                    return "hideNSeekButtonText".Translate();
                 case CustomGamemodes.PropHunt:
-                    return "TOR Prop Hunt";
+                    return "propHuntButtonText".Translate();
                 default:
                     return DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.GameTypeHideAndSeek);
             }

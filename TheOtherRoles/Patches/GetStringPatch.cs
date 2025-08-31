@@ -21,7 +21,7 @@ namespace TheOtherRoles.Patches {
             // For now only do this in custom options.
             int idInt = (int)id - 6000;
             CustomOption opt = CustomOption.options.FirstOrDefault(x => x.id == idInt);
-            ourString = opt?.name;
+            ourString = opt?.getName();
 
             __result = ourString;
 
