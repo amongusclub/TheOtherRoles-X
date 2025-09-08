@@ -16,40 +16,19 @@ namespace TheOtherRoles.Patches
     [HarmonyPatch]
     public static class CredentialsPatch
     {
-        public static string fullCredentialsVersion =
-$@"<size=130%><color=#ff351f>TheOtherRoles</color>-<color=#02C3FE>X</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}";
-
         [HarmonyPatch(typeof(PingTracker), nameof(PingTracker.Update))]
         internal static class PingTrackerPatch
         {
 
             static void Postfix(PingTracker __instance)
             {
-                var position = __instance.GetComponent<AspectPosition>();
-                if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started)
-                {
-                    string gameModeText = $"";
-                    if (HideNSeek.isHideNSeekGM) gameModeText = ModTranslation.getString("pingTrackerGameModeTextHNS");
-                    else if (HandleGuesser.isGuesserGm) gameModeText = ModTranslation.getString("pingTrackerGameModeTextGS");
-                    else if (PropHunt.isPropHuntGM) gameModeText = ModTranslation.getString("pingTrackerGameModeTextPH");
-                    if (gameModeText != "") gameModeText = Helpers.ColorString(Color.yellow, gameModeText) + (MeetingHud.Instance ? " " : "\n");
-                    __instance.text.text = $"<size=130%><color=#ff351f>TheOtherRoles</color>-<color=#02C3FE>X</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n{gameModeText}" + __instance.text.text;
-                    __instance.text.alignment = TextAlignmentOptions.Top;
-                    position.Alignment = AspectPosition.EdgeAlignments.Top;
-                    position.DistanceFromEdge = new Vector3(1.5f, 0.11f, 0);
-                }
-                else
+                if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started)
                 {
                     string gameModeText = $"";
                     if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) gameModeText = ModTranslation.getString("pingTrackerGameModeTextHNS");
                     else if (TORMapOptions.gameMode == CustomGamemodes.Guesser) gameModeText = ModTranslation.getString("pingTrackerGameModeTextGS");
                     else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) gameModeText = ModTranslation.getString("pingTrackerGameModeTextPH");
                     if (gameModeText != "") gameModeText = Helpers.ColorString(Color.yellow, gameModeText);
-
-                    __instance.text.text = $"{fullCredentialsVersion}\n{string.Format($"<size=60%>{ModTranslation.getString("fullCredentials")}</size>", "<color=#FCCE03FF>Fangkuai</color>", "<color=#FCCE03FF>TheOtherRoles</color>")}\n {__instance.text.text}";
-                    position.Alignment = AspectPosition.EdgeAlignments.LeftTop;
-                    __instance.text.alignment = TextAlignmentOptions.TopLeft;
-                    position.DistanceFromEdge = new Vector3(0.5f, 0.11f);
 
                     try
                     {
@@ -87,7 +66,11 @@ $@"<size=130%><color=#ff351f>TheOtherRoles</color>-<color=#02C3FE>X</color></siz
                 renderer.sprite = EventUtility.isEnabled ? banner2Sprite : bannerSprite;
                 var credentialObject = new GameObject("credentialsTOR");
                 var credentials = credentialObject.AddComponent<TextMeshPro>();
-                credentials.SetText($"v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n<size=30f%>\n</size>{string.Format(ModTranslation.getString("fullCredentials"), "<color=#FCCE03FF>Fangkuai</color>", "<color=#FCCE03FF>TheOtherRoles</color>")}\n<size=30%>\n</size>{string.Format($"<size=60%> <color=#FCCE03FF>{ModTranslation.getString("contributorsCredentials")}</color></size>", "<color=#ff351f>All-Of-Us-Mods</color>")}");
+                credentials.SetText($"v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n" +
+                                   string.Format(ModTranslation.getString("usedTimesText"), $"<color=#EFC3CA>{TheOtherRolesPlugin.ModUsageCount}</color>") +
+                                   $"\n{string.Format(ModTranslation.getString("fullCredentials"), "<color=#00FFFF>Fangkuai</color>", "<color=#FCCE03FF>TheOtherRoles</color>")}\n" +
+                                   $"<size=30%>\n</size>" +
+                                   $"{string.Format($"<size=60%> <color=#FCCE03FF>{ModTranslation.getString("contributorsCredentials")}</color></size>", "<color=#ff351f>All-Of-Us-Mods</color>")}");
                 credentials.alignment = TMPro.TextAlignmentOptions.Center;
                 credentials.fontSize *= 0.05f;
 
@@ -113,9 +96,9 @@ $@"<size=130%><color=#ff351f>TheOtherRoles</color>-<color=#02C3FE>X</color></siz
 
             public static void loadSprites()
             {
-                if (bannerSprite == null) bannerSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner.png", 300f);
-                if (banner2Sprite == null) banner2Sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner2.png", 300f);
-                if (horseBannerSprite == null) horseBannerSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.bannerTheHorseRoles.png", 300f);
+                if (bannerSprite == null) bannerSprite = Helpers.loadSpriteFromAssetBundle("Banner.png", 300f);
+                if (banner2Sprite == null) banner2Sprite = Helpers.loadSpriteFromAssetBundle("Banner2.png", 300f);
+                if (horseBannerSprite == null) horseBannerSprite = Helpers.loadSpriteFromAssetBundle("bannerTheHorseRoles.png", 300f);
             }
 
             public static void updateSprite()

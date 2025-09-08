@@ -302,10 +302,10 @@ namespace TheOtherRoles.Modules
                                 var sprite = buttonSprite.AddComponent<SpriteRenderer>();
                                 sprite.sprite =
                                     roleInfo.isImpostor ?
-                                    Helpers.loadSpriteFromResources("TheOtherRoles.Resources.DraftRoleCardImpostor.png", 250f) :
+                                    Helpers.loadSpriteFromAssetBundle("DraftRoleCardImpostor.png", 250f) :
                                     roleInfo.isNeutral ?
-                                    Helpers.loadSpriteFromResources("TheOtherRoles.Resources.DraftRoleCardNeutral.png", 250f) :
-                                    Helpers.loadSpriteFromResources("TheOtherRoles.Resources.DraftRoleCardCrew.png", 250f);
+                                    Helpers.loadSpriteFromAssetBundle("DraftRoleCardNeutral.png", 250f) :
+                                    Helpers.loadSpriteFromAssetBundle("DraftRoleCardCrew.png", 250f);
                                 buttonSprite.layer = actionButton.gameObject.layer;
                                 buttonSprite.transform.SetParent(actionButton.transform, false);
                                 buttonSprite.transform.localPosition = new Vector3(0, 0.025f, -1);
@@ -378,7 +378,7 @@ namespace TheOtherRoles.Modules
                             randomTextHolder.transform.localPosition = new Vector3(0, -3.075f, -1);
                             GameObject buttonSprite = new GameObject("buttonSprite");
                             var sprite = buttonSprite.AddComponent<SpriteRenderer>();
-                            sprite.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.DraftRoleCardRandom.png", 250f);
+                            sprite.sprite = Helpers.loadSpriteFromAssetBundle("DraftRoleCardRandom.png", 250f);
                             buttonSprite.layer = randomButton.gameObject.layer;
                             buttonSprite.transform.SetParent(randomButton.transform, false);
                             buttonSprite.transform.localPosition = new Vector3(0, 0.025f, -1);

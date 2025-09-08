@@ -38,7 +38,7 @@ namespace TheOtherRoles {
         public static string previousEndGameSummary = "";
         public static Dictionary<string, Sprite> CachedSprites = new();
 
-        public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit, bool cache=true) {
+        public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit, bool cache = true) {
             try
             {
                 if (cache && CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
@@ -51,6 +51,14 @@ namespace TheOtherRoles {
                 System.Console.WriteLine("Error loading sprite from path: " + path);
             }
             return null;
+        }
+
+        public static Sprite loadSpriteFromAssetBundle(string path, float pixelsPerUnit)
+        {
+            var sprite = AssetBundleManager.get(path, pixelsPerUnit);
+            if (sprite == null)
+                System.Console.WriteLine("Error loading sprite: " + path);
+            return sprite;
         }
 
         public static unsafe Texture2D loadTextureFromResources(string path) {
@@ -634,8 +642,8 @@ namespace TheOtherRoles {
             if (tzGO != null) {
                 var rend = tzGO.transform.Find("Inactive").GetComponent<SpriteRenderer>();
                 var rendActive = tzGO.transform.Find("Active").GetComponent<SpriteRenderer>();
-                rend.sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Plus_Button.png", 100f) : Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Minus_Button.png", 100f);
-                rendActive.sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Plus_ButtonActive.png", 100f) : Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Minus_ButtonActive.png", 100f);
+                rend.sprite = zoomOutStatus ? Helpers.loadSpriteFromAssetBundle("Plus_Button.png", 100f) : Helpers.loadSpriteFromAssetBundle("Minus_Button.png", 100f);
+                rendActive.sprite = zoomOutStatus ? Helpers.loadSpriteFromAssetBundle("Plus_ButtonActive.png", 100f) : Helpers.loadSpriteFromAssetBundle("Minus_ButtonActive.png", 100f);
                 tzGO.transform.localScale = new Vector3(1.2f, 1.2f, 1f) * (zoomOutStatus ? 4 : 1);
             }
 

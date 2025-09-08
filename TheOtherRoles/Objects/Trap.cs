@@ -23,7 +23,7 @@ namespace TheOtherRoles.Objects {
         private static Sprite trapSprite;
         public static Sprite getTrapSprite() {
             if (trapSprite) return trapSprite;
-            trapSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Trapper_Trap_Ingame.png", 300f);
+            trapSprite = Helpers.loadSpriteFromAssetBundle("Trapper_Trap_Ingame.png", 300f);
             return trapSprite;
         }
 

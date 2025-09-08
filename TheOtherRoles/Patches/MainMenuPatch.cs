@@ -5,14 +5,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.UI.Button;
 using Object = UnityEngine.Object;
-using TheOtherRoles.Patches;
 using UnityEngine.SceneManagement;
 using TheOtherRoles.Utilities;
 using AmongUs.Data;
 using Assets.InnerNet;
 using System.Linq;
+using TheOtherRoles.Modules;
 
-namespace TheOtherRoles.Modules {
+namespace TheOtherRoles.Patches
+{
     [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start))]
     public class MainMenuPatch {
         private static bool horseButtonState = TORMapOptions.enableHorseMode;
@@ -50,18 +51,18 @@ namespace TheOtherRoles.Modules {
 #endif
 
 
-            var buttonDiscord = UnityEngine.Object.Instantiate(template, template.transform.parent);
+            var buttonDiscord = Object.Instantiate(template, template.transform.parent);
             buttonDiscord.transform.localScale = new Vector3(0.42f, 0.84f, 0.84f);
             buttonDiscord.GetComponent<AspectPosition>().anchorPoint = new Vector2(0.542f, 0.5f);
 
             var textDiscord = buttonDiscord.transform.GetComponentInChildren<TMPro.TMP_Text>();
-            __instance.StartCoroutine(Effects.Lerp(0.5f, new System.Action<float>((p) => {
+            __instance.StartCoroutine(Effects.Lerp(0.5f, new Action<float>((p) => {
                 textDiscord.SetText("TOR Discord");
             })));
             PassiveButton passiveButtonDiscord = buttonDiscord.GetComponent<PassiveButton>();
             
-            passiveButtonDiscord.OnClick = new Button.ButtonClickedEvent();
-            passiveButtonDiscord.OnClick.AddListener((System.Action)(() => {
+            passiveButtonDiscord.OnClick = new ButtonClickedEvent();
+            passiveButtonDiscord.OnClick.AddListener((Action)(() => {
                     Application.OpenURL("https://discord.gg/SHvZMuKk");
             }));
 
@@ -74,14 +75,14 @@ namespace TheOtherRoles.Modules {
             creditsButton.GetComponent<AspectPosition>().anchorPoint = new Vector2(0.462f, 0.5f);
 
             var textCreditsButton = creditsButton.transform.GetComponentInChildren<TMPro.TMP_Text>();
-            __instance.StartCoroutine(Effects.Lerp(0.5f, new System.Action<float>((p) => {
+            __instance.StartCoroutine(Effects.Lerp(0.5f, new Action<float>((p) => {
                 textCreditsButton.SetText("TOR Credits");
             })));
             PassiveButton passiveCreditsButton = creditsButton.GetComponent<PassiveButton>();
 
-            passiveCreditsButton.OnClick = new Button.ButtonClickedEvent();
+            passiveCreditsButton.OnClick = new ButtonClickedEvent();
 
-            passiveCreditsButton.OnClick.AddListener((System.Action)delegate {
+            passiveCreditsButton.OnClick.AddListener((Action)delegate {
                 // do stuff
                 if (popUp != null) Object.Destroy(popUp);
                 var popUpTemplate = Object.FindObjectOfType<AnnouncementPopUp>(true);
@@ -139,7 +140,7 @@ License: TheOtherRoles is licensed under the [https://github.com/TheOtherRolesAU
 </size>";
                 creditsString += "</align>";
 
-                Assets.InnerNet.Announcement creditsAnnouncement = new() {
+                Announcement creditsAnnouncement = new() {
                     Id = "torCredits",
                     Language = 0,
                     Number = 500,
@@ -172,44 +173,44 @@ License: TheOtherRoles is licensed under the [https://github.com/TheOtherRolesAU
                 TORMapOptions.gameMode = CustomGamemodes.Classic;
                 // Add buttons For Guesser Mode, Hide N Seek in this scene.
                 // find "HostLocalGameButton"
-                var template = GameObject.FindObjectOfType<HostLocalGameButton>();
+                var template = Object.FindObjectOfType<HostLocalGameButton>();
                 var gameButton = template.transform.FindChild("CreateGameButton");
                 var gameButtonPassiveButton = gameButton.GetComponentInChildren<PassiveButton>();
 
-                var guesserButton = GameObject.Instantiate<Transform>(gameButton, gameButton.parent);
+                var guesserButton = Object.Instantiate(gameButton, gameButton.parent);
                 guesserButton.transform.localPosition += new Vector3(0f, -0.5f);
                 var guesserButtonText = guesserButton.GetComponentInChildren<TMPro.TextMeshPro>();
                 var guesserButtonPassiveButton = guesserButton.GetComponentInChildren<PassiveButton>();
                 
-                guesserButtonPassiveButton.OnClick = new Button.ButtonClickedEvent();
-                guesserButtonPassiveButton.OnClick.AddListener((System.Action)(() => {
+                guesserButtonPassiveButton.OnClick = new ButtonClickedEvent();
+                guesserButtonPassiveButton.OnClick.AddListener((Action)(() => {
                     TORMapOptions.gameMode = CustomGamemodes.Guesser;
                     template.OnClick();
                 }));
 
-                var HideNSeekButton = GameObject.Instantiate<Transform>(gameButton, gameButton.parent);
+                var HideNSeekButton = Object.Instantiate(gameButton, gameButton.parent);
                 HideNSeekButton.transform.localPosition += new Vector3(1.7f, -0.5f);
                 var HideNSeekButtonText = HideNSeekButton.GetComponentInChildren<TMPro.TextMeshPro>();
                 var HideNSeekButtonPassiveButton = HideNSeekButton.GetComponentInChildren<PassiveButton>();
                 
-                HideNSeekButtonPassiveButton.OnClick = new Button.ButtonClickedEvent();
-                HideNSeekButtonPassiveButton.OnClick.AddListener((System.Action)(() => {
+                HideNSeekButtonPassiveButton.OnClick = new ButtonClickedEvent();
+                HideNSeekButtonPassiveButton.OnClick.AddListener((Action)(() => {
                     TORMapOptions.gameMode = CustomGamemodes.HideNSeek;
                     template.OnClick();
                 }));
 
-                var PropHuntButton = GameObject.Instantiate<Transform>(gameButton, gameButton.parent);
+                var PropHuntButton = Object.Instantiate(gameButton, gameButton.parent);
                 PropHuntButton.transform.localPosition += new Vector3(3.4f, -0.5f);
                 var PropHuntButtonText = PropHuntButton.GetComponentInChildren<TMPro.TextMeshPro>();
                 var PropHuntButtonPassiveButton = PropHuntButton.GetComponentInChildren<PassiveButton>();
 
-                PropHuntButtonPassiveButton.OnClick = new Button.ButtonClickedEvent();
-                PropHuntButtonPassiveButton.OnClick.AddListener((System.Action)(() => {
+                PropHuntButtonPassiveButton.OnClick = new ButtonClickedEvent();
+                PropHuntButtonPassiveButton.OnClick.AddListener((Action)(() => {
                     TORMapOptions.gameMode = CustomGamemodes.PropHunt;
                     template.OnClick();
                 }));
 
-                template.StartCoroutine(Effects.Lerp(0.1f, new System.Action<float>((p) => {
+                template.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
                     guesserButtonText.SetText("guesserButtonText".Translate());
                     HideNSeekButtonText.SetText("hideNSeekButtonText".Translate());
                     PropHuntButtonText.SetText("propHuntButtonText".Translate());

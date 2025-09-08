@@ -10,12 +10,18 @@
 		<PlatformTarget>AnyCPU</PlatformTarget>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<Platforms>AnyCPU</Platforms>
-		<DebugType>embedded</DebugType>
 		<Configurations>PC;Android</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\**" />
+		<EmbeddedResource Include="Resources\**"
+						  Exclude="Resources\SoundEffects\toraudio_Android;
+						  Resources\IntroAnimation\intro_Android;
+						   Resources\torxresources_Android" Condition="'$(Configuration)' == 'PC'" />
+		<EmbeddedResource Include="Resources\**"
+						  Exclude="Resources\SoundEffects\toraudio_Win;
+						  Resources\IntroAnimation\intro_Win;
+						  Resources\IntroAnimation\torxresources_Win" Condition="'$(Configuration)' == 'Android'" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -23,7 +29,7 @@
 		<PackageReference Include="AmongUs.GameLibs.Android" Version="2025.6.10" Condition="'$(Configuration)' == 'Android'" />
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" />
 		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" />
-		<PackageReference Include="Reactor" Version="2.3.1" />
+		<PackageReference Include="Reactor" Version="2.5.0-ci.371" />
 	</ItemGroup>
 
 	<Target Name="Date" BeforeTargets="BeforeBuild">

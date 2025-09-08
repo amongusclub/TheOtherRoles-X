@@ -21,7 +21,7 @@ public static class EventUtility {
     public static Sprite getKickButtonSprite() {
         
         if (kickButtonSprite) return kickButtonSprite;
-        kickButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.EventKickButton.png", 115f);
+        kickButtonSprite = Helpers.loadSpriteFromAssetBundle("EventKickButton.png", 115f);
         return kickButtonSprite;
     }
 

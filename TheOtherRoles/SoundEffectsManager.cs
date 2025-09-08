@@ -7,7 +7,6 @@ using Reactor.Utilities.Extensions;
 namespace TheOtherRoles
 {
     public static class SoundEffectsManager
-
     {
         private static Dictionary<string, AudioClip> soundEffects = new();
 

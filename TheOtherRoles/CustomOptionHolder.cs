@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
-using Types = TheOtherRoles.CustomOption.CustomOptionType;
+using Types = TheOtherRoles.Modules.CustomOption.CustomOptionType;
 
 namespace TheOtherRoles;
 

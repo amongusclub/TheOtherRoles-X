@@ -13,7 +13,7 @@ namespace TheOtherRoles.Objects {
         private static Sprite TraceSprite;
         public static Sprite getTraceSprite() {
             if (TraceSprite) return TraceSprite;
-            TraceSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.NinjaTraceW.png", 225f);
+            TraceSprite = Helpers.loadSpriteFromAssetBundle("NinjaTraceW.png", 225f);
             return TraceSprite;
         }
 

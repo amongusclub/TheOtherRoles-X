@@ -3,6 +3,7 @@ using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 
 using TheOtherRoles.Utilities;
@@ -15,7 +16,7 @@ namespace TheOtherRoles.Patches {
 	static class MapBehaviourPatch {
 		public static Dictionary<Byte, SpriteRenderer> herePoints = new();
 
-		public static Sprite Vent = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Vent.png", 150f);
+		public static Sprite Vent = Helpers.loadSpriteFromAssetBundle("Vent.png", 150f);
 
 		public static List<List<Vent>> VentNetworks = new();
 

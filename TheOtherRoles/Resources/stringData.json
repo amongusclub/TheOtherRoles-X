@@ -2799,6 +2799,10 @@
         "0": "Special thanks to {0}",
         "13": "\u7279\u522b\u611f\u8c22 {0}"
     },
+    "usedTimesText": {
+        "0": "Used {0} times",
+        "13": "\u622a\u81f3\u4eca\u65e5,\u6b64\u6a21\u7ec4\u5df2\u7ecf\u88ab\u4f7f\u7528{0}\u6b21\u4e86~"
+    },
     "engineerRepair": {
         "0": "Repair",
         "13": "\u4fee\u7406"

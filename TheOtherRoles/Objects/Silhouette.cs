@@ -23,7 +23,7 @@ namespace TheOtherRoles.Objects {
         private static Sprite SilhouetteSprite;
         public static Sprite getSilhouetteSprite() {
             if (SilhouetteSprite) return SilhouetteSprite;
-            SilhouetteSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Silhouette.png", 225f);
+            SilhouetteSprite = Helpers.loadSpriteFromAssetBundle("Silhouette.png", 225f);
             return SilhouetteSprite;
         }
 
