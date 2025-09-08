@@ -21,7 +21,7 @@
 		<EmbeddedResource Include="Resources\**"
 						  Exclude="Resources\SoundEffects\toraudio_Win;
 						  Resources\IntroAnimation\intro_Win;
-						  Resources\IntroAnimation\torxresources_Win" Condition="'$(Configuration)' == 'Android'" />
+						  Resources\torxresources_Win" Condition="'$(Configuration)' == 'Android'" />
 	</ItemGroup>
 
 	<ItemGroup>
