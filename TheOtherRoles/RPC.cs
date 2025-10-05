@@ -230,10 +230,14 @@ namespace TheOtherRoles
         }
 
         public static void shareGamemode(byte gm) {
-            TORMapOptions.gameMode = (CustomGamemodes) gm;
-            LobbyViewSettingsPatch.currentButtons?.ForEach(x => x.gameObject?.Destroy());
-            LobbyViewSettingsPatch.currentButtons?.Clear();
-            LobbyViewSettingsPatch.currentButtonTypes?.Clear();
+            try
+            {
+                TORMapOptions.gameMode = (CustomGamemodes)gm;
+                LobbyViewSettingsPatch.currentButtons?.ForEach(x => x.gameObject?.Destroy());
+                LobbyViewSettingsPatch.currentButtons?.Clear();
+                LobbyViewSettingsPatch.currentButtonTypes?.Clear();
+            }
+            catch { }
         }
 
         public static void stopStart(byte playerId) {

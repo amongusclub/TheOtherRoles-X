@@ -19,10 +19,11 @@ namespace TheOtherRoles.Patches
         private static bool versionSent = false;
         private static string lobbyCodeText = "";
 
-        [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerJoined))]
-        public class AmongUsClientOnPlayerJoinedPatch
+        // [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerJoined))] NOT Run in Android(Android user join in PC Room)
+        [HarmonyPatch(typeof(PlayerPhysics._CoSpawnPlayer_d__42), nameof(PlayerPhysics._CoSpawnPlayer_d__42.MoveNext))]
+        public class AmongUsClientCreatePlayerPatch
         {
-            public static void Postfix(AmongUsClient __instance)
+            public static void Postfix(PlayerPhysics._CoSpawnPlayer_d__42 __instance)
             {
                 if (PlayerControl.LocalPlayer != null)
                 {
@@ -75,19 +76,11 @@ namespace TheOtherRoles.Patches
                     Helpers.shareGameVersion();
                 }
 
-
                 // Check version handshake infos
                 var versionMismatch = false;
                 var message = "";
                 foreach (var client in AmongUsClient.Instance.allClients.ToArray())
                 {
-                    try
-                    {
-                        Helpers.playerById(GameData.Instance.GetPlayerByClient(client).PlayerId).cosmetics.nameText.text = $"{client.PlayerName} {client.GetPlatform()}";
-                    }
-                    catch
-                    { }
-
                     if (client.Character == null) continue;
                     if (!playerVersions.ContainsKey(client.Id))
                     {
@@ -284,7 +277,9 @@ namespace TheOtherRoles.Patches
                         (byte)CustomRPC.ShareGamemode, SendOption.Reliable);
                     writer.Write((byte)TORMapOptions.gameMode);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
-                    RPCProcedure.shareGamemode((byte)TORMapOptions.gameMode);
+                    try
+                    { RPCProcedure.shareGamemode((byte)TORMapOptions.gameMode); }
+                    catch { }
                     sendGamemode = false;
                 }
             }

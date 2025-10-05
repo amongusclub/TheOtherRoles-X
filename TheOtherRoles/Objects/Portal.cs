@@ -170,7 +170,7 @@ namespace TheOtherRoles.Objects
             {
                 getFgAnimationSprite(i);
             }
-            portalSprite = Helpers.loadSpriteFromAssetBundle("PortalAnimation.plattform.png", 115f);
+            portalSprite = Helpers.loadSpriteFromAssetBundle("PortalAnimation/plattform.png", 115f);
         }
 
         public static void clearPortals()

@@ -35,7 +35,7 @@ namespace TheOtherRoles
     public class TheOtherRolesPlugin : BasePlugin
     {
         public const string Id = "me.eisbison.theotherroles";
-        public const string VersionString = "1.0.0";
+        public const string VersionString = "1.1.0";
         public static uint betaDays = 0;  // amount of days for the build to be usable (0 for infinite!)
 
         public static Version Version = Version.Parse(VersionString);
@@ -68,10 +68,10 @@ namespace TheOtherRoles
 
         // This is part of the Mini.RegionInstaller, Licensed under GPLv3
         // file="RegionInstallPlugin.cs" company="miniduikboot">
-        /*public static void UpdateRegions() {
+        public static void UpdateRegions() {
             ServerManager serverManager = FastDestroyableSingleton<ServerManager>.Instance;
             var regions = new IRegionInfo[] {
-                new StaticHttpRegionInfo("TheOtherRolesX-CN", StringNames.NoTranslation, Ip.Value, new Il2CppReferenceArray<ServerInfo>(new ServerInfo[1] { new ServerInfo("Custom", Ip.Value, Port.Value, false) })).CastFast<IRegionInfo>()
+                new StaticHttpRegionInfo("Custom", StringNames.NoTranslation, Ip.Value, new Il2CppReferenceArray<ServerInfo>(new ServerInfo[1] { new ServerInfo("Custom", Ip.Value, Port.Value, false) })).CastFast<IRegionInfo>()
             };
             
             IRegionInfo currentRegion = serverManager.CurrentRegion;
@@ -91,13 +91,13 @@ namespace TheOtherRoles
                 Logger.LogDebug("Resetting previous region");
                 serverManager.SetRegion(currentRegion);
             }
-        }*/
+        }
 
         private async void SendModUsageRequest()
         {
             try
             {
-                string url = "https://player.fangkuai.fun/api/modusage/register?modName=TheOtherRoles-X";
+                string url = "https://player.amongusclub.cn/api/modusage/register?modName=TheOtherRoles-X";
                 var request = UnityWebRequest.Get(url);
 
                 var operation = request.SendWebRequest();
@@ -128,7 +128,7 @@ namespace TheOtherRoles
             Logger = Log;
             Instance = this;
 
-            ModTranslation.Load();
+            AssetLoader.LoadAssets();
             AssetBundleManager.Load();
 #if PC
             _ = Helpers.checkBeta(); // Exit if running an expired beta
@@ -155,7 +155,7 @@ namespace TheOtherRoles
             defaultRegions = ServerManager.DefaultRegions;
             // Removes vanilla Servers
             ServerManager.DefaultRegions = new Il2CppReferenceArray<IRegionInfo>(new IRegionInfo[0]);
-            // UpdateRegions();
+            UpdateRegions();
 
             // Reactor Credits
             ReactorCredits.Register("TheOtherRoles-X", VersionString, betaDays > 0, location => location == Reactor.Utilities.ReactorCredits.Location.PingTracker);
@@ -181,6 +181,7 @@ namespace TheOtherRoles
             _ = RoleInfo.loadReadme();
             AddToKillDistanceSetting.addKillDistance();
             SendModUsageRequest();
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomServerMenu));
             TheOtherRolesPlugin.Logger.LogInfo("Loading TOR completed!");
         }
     }
@@ -194,6 +195,7 @@ namespace TheOtherRoles
             __result = false;
         }
     }
+
     [HarmonyPatch(typeof(ChatController), nameof(ChatController.Awake))]
     public static class ChatControllerAwakePatch {
         private static void Prefix() {
@@ -225,12 +227,12 @@ namespace TheOtherRoles
 
 
             // Spawn dummys
-            /*if (Input.GetKeyDown(KeyCode.F)) {
+            if (Input.GetKeyDown(KeyCode.F)) {
                 var playerControl = UnityEngine.Object.Instantiate(AmongUsClient.Instance.PlayerPrefab);
                 var i = playerControl.PlayerId = (byte) GameData.Instance.GetAvailableId();
 
                 bots.Add(playerControl);
-                GameData.Instance.AddPlayer(playerControl, new InnerNet.ClientData(0));
+                GameData.Instance.AddDummy(playerControl);
                 AmongUsClient.Instance.Spawn(playerControl, -2, InnerNet.SpawnFlags.None);
                 
                 playerControl.transform.position = PlayerControl.LocalPlayer.transform.position;
@@ -239,7 +241,7 @@ namespace TheOtherRoles
                 playerControl.SetName(RandomString(10));
                 playerControl.SetColor((byte) random.Next(Palette.PlayerColors.Length));
                 playerControl.Data.RpcSetTasks(new byte[0]);
-            }*/
+            }
 
             // Terminate round
             if(Input.GetKeyDown(KeyCode.L)) {

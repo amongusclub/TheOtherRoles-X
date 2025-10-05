@@ -715,68 +715,6 @@ namespace TheOtherRoles {
             return AccessTools.Method(self.GetType(), nameof(Il2CppObjectBase.TryCast)).MakeGenericMethod(type).Invoke(self, Array.Empty<object>());
         }
 
-        public static string GetPlatform(this ClientData clientData)
-        {
-            try
-            {
-                var color = "";
-                var name = "";
-                string text;
-                switch (clientData.PlatformData.Platform)
-                {
-                    case Platforms.StandaloneEpicPC:
-                        color = "#905CDA";
-                        name = "Itch";
-                        break;
-                    case Platforms.StandaloneSteamPC:
-                        color = "#4391CD";
-                        name = "Steam";
-                        break;
-                    case Platforms.StandaloneMac:
-                        color = "#e3e3e3";
-                        name = "Mac.";
-                        break;
-                    case Platforms.StandaloneWin10:
-                        color = "#FFF88D";
-                        name = "Windows";
-                        break;
-                    case Platforms.StandaloneItch:
-                        color = "#E35F5F";
-                        name = "Itch";
-                        break;
-                    case Platforms.IPhone:
-                        color = "#e3e3e3";
-                        name = "IPhone";
-                        break;
-                    case Platforms.Android:
-                        color = "#5DE2E7";
-                        name = "Android";
-                        break;
-                    case Platforms.Switch:
-                        name = "<color=#00B2FF>Nintendo</color><color=#ff0000>Switch</color>";
-                        break;
-                    case Platforms.Xbox:
-                        color = "#07ff00";
-                        name = "Xbox";
-                        break;
-                    case Platforms.Playstation:
-                        color = "#0014b4";
-                        name = "PlayStation";
-                        break;
-                }
-
-                if (color != "" && name != "")
-                    text = $"<color={color}>{name}</color>";
-                else
-                    text = name;
-                return text;
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
         public static bool isChinese()
         {
             try

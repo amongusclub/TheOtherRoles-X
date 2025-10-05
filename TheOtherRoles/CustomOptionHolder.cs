@@ -3,7 +3,7 @@ using TheOtherRoles.Modules;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
-using Types = TheOtherRoles.Modules.CustomOption.CustomOptionType;
+using Types = TheOtherRoles.Modules.CustomOption.CustomOptionMenu;
 
 namespace TheOtherRoles;
 
@@ -17,8 +17,8 @@ public class CustomOptionHolder
 
     public static string[] presets = new[]
     {
-        "presetSelectionText1", "presetSelectionText2", "presetSelectionText3", "presetSelectionText4", "presetSelectionText5",
-        "presetSelectionText6", "presetSelectionText7", "presetSelectionText8"
+        ModTranslation.getString("presetSelectionText1"), ModTranslation.getString("presetSelectionText2"), ModTranslation.getString("presetSelectionText3"), ModTranslation.getString("presetSelectionText4"),
+        ModTranslation.getString("presetSelectionText5"), ModTranslation.getString("presetSelectionText6"), ModTranslation.getString("presetSelectionText7"), ModTranslation.getString("presetSelectionText8")
     };
 
     public static CustomOption presetSelection;
@@ -76,7 +76,7 @@ public class CustomOptionHolder
     public static CustomOption guesserKillsThroughShield;
     public static CustomOption guesserEvilCanKillSpy;
     public static CustomOption guesserSpawnBothRate;
-    public static CustomOption guesserCantGuessSnitchIfTaksDone;
+    public static CustomOption guesserCantGuessSnitchIfTasksDone;
 
     public static CustomOption jesterSpawnRate;
     public static CustomOption jesterCanCallEmergency;
@@ -456,7 +456,7 @@ public class CustomOptionHolder
         CustomOption.vanillaSettings = TheOtherRolesPlugin.Instance.Config.Bind("Preset0", "VanillaOptions", "");
 
         // Role Options
-        presetSelection = new CustomOption(0, "", Types.General, cs(new Color(204f / 255f, 204f / 255f, 0, 1f), "presetSelectionText"), presets, "", null, true);
+        presetSelection = new CustomOption(0, "", Types.General, CustomOption.CustomOptionType.String, cs(new Color(204f / 255f, 204f / 255f, 0, 1f), "presetSelectionText"), presets, "", null, true);
 
         if (EventUtility.canBeEnabled)
             enableEventMode = CustomOption.Create(Types.General, cs(Color.green, "enableEventMode"), true,
@@ -570,7 +570,7 @@ public class CustomOptionHolder
         guesserKillsThroughShield = CustomOption.Create(Types.Neutral, "guesserKillsThroughShield", true, guesserSpawnRate);
         guesserEvilCanKillSpy = CustomOption.Create(Types.Neutral, "guesserEvilCanKillSpy", true, guesserSpawnRate);
         guesserSpawnBothRate = CustomOption.Create(Types.Neutral, "guesserSpawnBothRate", rates, guesserSpawnRate);
-        guesserCantGuessSnitchIfTaksDone = CustomOption.Create(Types.Neutral, "guesserCantGuessSnitchIfTaksDone", true, guesserSpawnRate);
+        guesserCantGuessSnitchIfTasksDone = CustomOption.Create(Types.Neutral, "guesserCantGuessSnitchIfTaksDone", true, guesserSpawnRate);
 
         jesterSpawnRate = CustomOption.CreateRoleOption(Types.Neutral, RoleId.Jester, rates, null, true);
         jesterCanCallEmergency = CustomOption.Create(Types.Neutral, "jesterCanCallEmergency", true, jesterSpawnRate);

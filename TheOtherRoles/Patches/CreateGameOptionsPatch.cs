@@ -21,6 +21,8 @@ internal class CreateGameOptionsPatch
     {
         static void Postfix(CreateGameOptions __instance)
         {
+            if (SubmergedCompatibility.Loaded) return;
+
             if ((modeButtonGS != null && modeButtonGS.IsSelected()) ||
                 (modeButtonHK != null && modeButtonHK.IsSelected()) ||
                 (modeButtonPH != null && modeButtonPH.IsSelected()))
@@ -36,6 +38,8 @@ internal class CreateGameOptionsPatch
     {
         private static void Postfix(CreateGameOptions __instance)
         {
+            if (SubmergedCompatibility.Loaded) return;
+
             __instance.levelButtons[0].transform.parent.gameObject.SetActive(false);
             GameObject.Find("ModeOptions").transform.SetLocalY(-2.52f);
             GameObject.Find("ServerOption").transform.SetLocalY(-0.86f);
@@ -147,6 +151,8 @@ internal class CreateGameOptionsPatch
 
         static void Postfix(CreateGameOptions __instance)
         {
+            if (SubmergedCompatibility.Loaded) return;
+
             __instance.containerConfirm.GetChild(10).gameObject.SetActive(false);
             __instance.containerConfirm.GetChild(8).localPosition = new(4f, -0.47f, -0.1f);
             __instance.containerConfirm.GetChild(5).GetChild(2).GetComponent<TextMeshPro>().SetText(getModeText(TORMapOptions.gameMode));

@@ -33,7 +33,7 @@ namespace TheOtherRoles.Patches
                     try
                     {
                         var GameModeText = GameObject.Find("GameModeText")?.GetComponent<TextMeshPro>();
-                        GameModeText.text = gameModeText == "" ? (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek ? "Van. HideNSeek" : "Classic") : gameModeText;
+                        GameModeText.text = gameModeText == "" ? (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek ? ModTranslation.getString("vanHNSText") : ModTranslation.getString("vanClassicText")) : gameModeText;
                         var ModeLabel = GameObject.Find("ModeLabel")?.GetComponentInChildren<TextMeshPro>();
                         ModeLabel.text = ModTranslation.getString("pingTrackerGameModeText");
                     }
@@ -155,7 +155,7 @@ namespace TheOtherRoles.Patches
 #if PC
             public static async Task loadMOTDs() {
                 HttpClient client = new HttpClient();
-                HttpResponseMessage response = await client.GetAsync("https://dlhk.fangkuai.fun/TheOtherRoles-X/motd.txt");
+                HttpResponseMessage response = await client.GetAsync("https://dl.amongusclub.cn/TheOtherRoles-X/motd.txt");
                 response.EnsureSuccessStatusCode();
                 string motds = await response.Content.ReadAsStringAsync();
                 foreach(string line in motds.Split("\n", StringSplitOptions.RemoveEmptyEntries)) {
@@ -165,7 +165,7 @@ namespace TheOtherRoles.Patches
 #else
             public static void loadMOTDs()
             {
-                string url = "https://dlhk.fangkuai.fun/TheOtherRoles-X/motd.txt";
+                string url = "https://dl.amongusclub.cn/TheOtherRoles-X/motd.txt";
                 var request = UnityWebRequest.Get(url);
                 request.SendWebRequest();
 

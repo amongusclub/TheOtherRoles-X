@@ -407,10 +407,11 @@ namespace TheOtherRoles.CustomGameModes {
         [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
 #endif
 #if ANDROID
-        [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
+        [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.StartSFX))]
+        [HarmonyPatch(typeof(FungleShipStatus), nameof(FungleShipStatus.StartSFX))]
 #endif
         [HarmonyPostfix]
-        public static void IntroCutsceneDestroyPatch(IntroCutscene __instance) {
+        public static void IntroCutsceneDestroyPatch() {
             if (!isPropHuntGM || !PlayerControl.LocalPlayer.Data.Role.IsImpostor) return;
             PlayerControl.LocalPlayer.moveable = false;
             MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);

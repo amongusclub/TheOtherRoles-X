@@ -14,7 +14,7 @@ using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles.Patches {
 #if PC
-        [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
+    [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
 #endif
 #if ANDROID
     [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
@@ -23,7 +23,12 @@ namespace TheOtherRoles.Patches {
     {
         public static PoolablePlayer playerPrefab;
         public static Vector3 bottomLeft;
-        public static void Prefix(IntroCutscene __instance) {
+#if PC
+        [HarmonyPrefix]
+#else
+        [HarmonyPostfix]
+#endif
+        public static void IntroCutsceneDestroyPatch(IntroCutscene __instance) {
             // Generate and initialize player icons
             int playerCounter = 0;
             int hideNSeekCounter = 0;
@@ -41,7 +46,7 @@ namespace TheOtherRoles.Patches {
                     p.SetPlayerMaterialColors(player.cosmetics.currentBodySprite.BodySprite);
                     player.SetSkin(data.DefaultOutfit.SkinId, data.DefaultOutfit.ColorId);
                     player.cosmetics.SetHat(data.DefaultOutfit.HatId, data.DefaultOutfit.ColorId);
-                   // PlayerControl.SetPetImage(data.DefaultOutfit.PetId, data.DefaultOutfit.ColorId, player.PetSlot);
+                    // PlayerControl.SetPetImage(data.DefaultOutfit.PetId, data.DefaultOutfit.ColorId, player.PetSlot);
                     player.cosmetics.nameText.text = data.PlayerName;
                     player.SetFlipX(true);
                     TORMapOptions.playerIcons[p.PlayerId] = player;
@@ -187,7 +192,8 @@ namespace TheOtherRoles.Patches {
                     }
                     else
                     {
-                        __instance.ImpostorText.text = DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.NumImpostorsP, (Il2CppReferenceArray<Il2CppSystem.Object>)(new object[] { adjustedNumImpostors }));
+                        var parameters = new Il2CppReferenceArray<Il2CppSystem.Object>(new Il2CppSystem.Object[] { (Il2CppSystem.Object)adjustedNumImpostors });
+                        __instance.ImpostorText.text = DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.NumImpostorsP, parameters);
                     }
                     __instance.ImpostorText.text = __instance.ImpostorText.text.Replace("[FF1919FF]", "<color=#FF1919FF>");
                     __instance.ImpostorText.text = __instance.ImpostorText.text.Replace("[]", "</color>");

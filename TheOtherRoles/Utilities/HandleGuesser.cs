@@ -46,7 +46,7 @@ namespace TheOtherRoles.Utilities {
                 evilGuesserCanGuessSpy = CustomOptionHolder.guesserGamemodeEvilCanKillSpy.getBool();
                 tasksToUnlock = Mathf.RoundToInt(CustomOptionHolder.guesserGamemodeCrewGuesserNumberOfTasks.getFloat());
             } else {
-                guesserCantGuessSnitch = CustomOptionHolder.guesserCantGuessSnitchIfTaksDone.getBool();
+                guesserCantGuessSnitch = CustomOptionHolder.guesserCantGuessSnitchIfTasksDone.getBool();
                 hasMultipleShotsPerMeeting = CustomOptionHolder.guesserHasMultipleShotsPerMeeting.getBool();
                 killsThroughShield = CustomOptionHolder.guesserKillsThroughShield.getBool();
                 evilGuesserCanGuessSpy = CustomOptionHolder.guesserEvilCanKillSpy.getBool();
