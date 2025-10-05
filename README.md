@@ -2,7 +2,7 @@
 <p align="center"><a href="https://github.com/fangkuaiclub/TheOtherRoles-X/releases/"><img src="https://badgen.net/github/release/fangkuaiclub/theotherroles-x"></a></p>
 
 
-This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.</p>
+This mod is not affiliated with Among Us or Innersloth LLC, 和 the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.</p>
 <p align="center">
   To other mod devs: for usage of our code, please read and respect the <a href="#license">license</a></p>
 
@@ -42,6 +42,7 @@ Even more roles are coming soon. :)
 # Releases
 | Among Us - Version| Mod Version | Link |
 |----------|-------------|-----------------|
+| 17.0.0s&a| v1.1.0| [Download](https://github.com/fangkuaiclub/TheOtherRoles-X/releases/download/v1.1.0/TheOtherRolesX.zip)
 | 16.0.5s & 16.1.0s| v1.0.0| [Download](https://github.com/fangkuaiclub/TheOtherRoles-X/releases/download/v1.0.0/TheOtherRolesX.zip)
 
 <details>
@@ -58,13 +59,20 @@ Even more roles are coming soon. :)
   <summary>Click to show the Changelog</summary>
 
 **Version 1.1.0**
-
+- Fix Android users unable to synchronize the settings of Windows host
+- Fix Android users entering the Windows room prompt that the homeowner has not installed the mod
+- And More
+- Updated to Among Us version 17.0.0
+- Fix custom server
+- Fix the issue of Portal not displaying in the game
+- Correct some spelling errors in the text
+  
 </details>
 
 # Installation
 
 ## Windows Installation Steam
-1. Download the newest [release](https://github.com/Eisbison/TheOtherRoles/releases/latest)
+1. Download the newest [release](https://github.com/amongusclub/TheOtherRoles-X/releases/latest)
 2. Find the folder of your game. You can right click on the game in your library, a menu will appear, click on properties, local data, browse
 3. Go back one folder to common and make a copy of your Among Us game folder and paste it somewhere on the same drive.
 4. Now unzip and drag or extract the files from the .zip into your Among Us game folder that you just copied, at the `.exe` level (just into the folder).
@@ -73,7 +81,7 @@ Even more roles are coming soon. :)
 Not working? You might want to install the dependency [vc_redist](https://aka.ms/vs/16/release/vc_redist.x86.exe)
 
 ## Windows Installation Epic
-1. Download the newest [release](https://github.com/Eisbison/TheOtherRoles/releases/latest)
+1. Download the newest [release](https://github.com/amongusclub/TheOtherRoles-X/releases/latest)
 2. Find the folder of your game. Should be stored in "Epic/AmongUs" (wherever you installed Epic on your PC)
 3. Now unzip and drag or extract the files from the .zip into the original Epic Among Us game folder.
 4. Run the game by starting the game in your Epic Games launcher (the first launch might take a while).
