@@ -107,15 +107,15 @@ Not working? You might want to install the dependency [vc_redist](https://aka.ms
   "AntiCheat": {
     "Enabled": true,
     "BanIpFromGame": true,
-    "AllowCheatingHosts": "Never",
+    "AllowCheatingHosts": "Always",
     "EnableGameFlowChecks": true,
     "EnableMustBeHostChecks": true,
-    "EnableColorLimitChecks": true,
-    "EnableNameLimitChecks": true,
-    "EnableOwnershipChecks": true,
+    "EnableColorLimitChecks": false,
+    "EnableNameLimitChecks": false,
+    "EnableOwnershipChecks": false,
     "EnableRoleChecks": true,
     "EnableTargetChecks": true,
-    "ForbidProtocolExtensions": true
+    "ForbidProtocolExtensions": false
   }
 ```
 4. Make sure to forward the right ports on the hosting machine.
